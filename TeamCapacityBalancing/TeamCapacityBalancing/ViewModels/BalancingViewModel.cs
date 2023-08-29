@@ -56,14 +56,14 @@ public sealed partial class BalancingViewModel : ObservableObject
                 new IssueData("Sample Story 1", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new List<string> { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"},
+                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
             new UserStoryAssociation(
                 new IssueData("Sample Story 2", 8.0f, "Release 2", "Sprint 2", true, IssueData.IssueType.Story),
                 false,
                 5.0f,
-                new List<string> { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"},
+                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 60.0f
             ),
     };
@@ -74,7 +74,7 @@ public sealed partial class BalancingViewModel : ObservableObject
                 new IssueData("Balancing", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new List<string> { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"},
+                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
     };
@@ -97,39 +97,38 @@ public sealed partial class BalancingViewModel : ObservableObject
                 new IssueData("Total work open story", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new List<string> { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"},
+                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
        new UserStoryAssociation(
                 new IssueData("Total work", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new List<string> { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"},
+                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
        new UserStoryAssociation(
                 new IssueData("Total capacity", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new List<string> { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"},
+                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
     };
 
     public ObservableCollection<IssueData> Epics { get; set; } = new() { new("Epic 1"), new("Epic 2"), new("Epic 3") };
-    public ObservableCollection<IssueData> Storyes { get; set; } = new() { new("Story 1"), new("Story 2"), new("Story 3") };
 
     public Team TeamMembers { get; set; } = new Team(new List<User>
             {
-                new User("user1", "User One", 1),
-                new User("user2", "User Two", 2),
-                new User("user3", "User Three", 3),
-                new User("user4", "User Four", 3),
-                new User("user5", "User Five", 3),
-                new User("user6", "User Six", 3),
-                new User("user7", "User Seven", 3),
-                new User("user8", "User Eight", 3),
-                new User("user9", "User Nine", 3),
-                new User("user10", "User Ten", 3),
+                new User("user1", "User One", 1, true),
+                new User("user2", "User Two", 2, true),
+                new User("user3", "User Three", 3, true),
+                new User("user4", "User Four", 3, false),
+                new User("user5", "User Five", 3, false),
+                new User("user6", "User Six", 3, false),
+                new User("user7", "User Seven", 3,false),
+                new User("user8", "User Eight", 3,false),
+                new User("user9", "User Nine", 3,false),
+                new User("user10", "User Ten", 3,false),
             });
 }

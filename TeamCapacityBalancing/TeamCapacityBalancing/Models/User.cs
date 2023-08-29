@@ -16,12 +16,15 @@ using System.Threading.Tasks;
         public bool HasTeam { get; set; }
       
         public int Id { get; set; }
+
+        public bool IsMember { get; set; }
       
-        public User(string username, string displayName, int id)
+        public User(string username, string displayName, int id, bool isMember)
         {
             Username = username;
             DisplayName = displayName;
             Id = id;
+            IsMember = isMember;
         }
 
         public User(string username)

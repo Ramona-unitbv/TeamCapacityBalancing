@@ -35,7 +35,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                         string username = reader.GetString(reader.GetOrdinal("user_name"));
                         string displayName = reader.GetString(reader.GetOrdinal("display_name"));
                         int id = reader.GetInt32(reader.GetOrdinal("id"));
-                        users.Add(new User(username, displayName, id));
+                        users.Add(new User(username, displayName, id, true));
                     }
                 }
             }
