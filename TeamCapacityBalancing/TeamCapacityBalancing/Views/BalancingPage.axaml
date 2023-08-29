@@ -125,7 +125,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[0].DisplayName}" IsVisible="{Binding TeamMembers.Users[0].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[0], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[0], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -135,7 +135,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[1].DisplayName}" IsVisible="{Binding TeamMembers.Users[1].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[1], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[1], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -145,7 +145,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[2].DisplayName}" IsVisible="{Binding TeamMembers.Users[2].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[2], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[2], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -154,7 +154,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[3].DisplayName}" IsVisible="{Binding TeamMembers.Users[3].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[3], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[3], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -164,7 +164,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[4].DisplayName}" IsVisible="{Binding TeamMembers.Users[4].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[4], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[4], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -174,17 +174,17 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[5].DisplayName}" IsVisible="{Binding TeamMembers.Users[5].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[5], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[5], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
-					
+
 					<DataGrid.Columns>
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[6].DisplayName}" IsVisible="{Binding TeamMembers.Users[6].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[6], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[6], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -194,7 +194,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[7].DisplayName}" IsVisible="{Binding TeamMembers.Users[7].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[7], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[7], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -204,7 +204,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[8].DisplayName}" IsVisible="{Binding TeamMembers.Users[8].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[8], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[8], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -214,7 +214,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[9].DisplayName}" IsVisible="{Binding TeamMembers.Users[9].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[9], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[9], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -232,6 +232,7 @@
 
 				</DataGrid>
 				<DataGrid Grid.Row="1" Height="150" ColumnWidth="*" IsVisible="{Binding IsShortTermVisible}" Items="{Binding MyUserAssociation}" AutoGenerateColumns="False" GridLinesVisibility="All" BorderThickness="1" BorderBrush="Gray">
+
 
 					<DataGrid.Columns>
 						<DataGridTemplateColumn Header="Story">
@@ -267,7 +268,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[0].DisplayName}" IsVisible="{Binding TeamMembers.Users[0].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[0], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[0], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -277,7 +278,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[1].DisplayName}" IsVisible="{Binding TeamMembers.Users[1].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[1], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[1], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -287,7 +288,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[2].DisplayName}" IsVisible="{Binding TeamMembers.Users[2].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[2], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[2], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -296,7 +297,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[3].DisplayName}" IsVisible="{Binding TeamMembers.Users[3].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[3], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[3], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -306,7 +307,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[4].DisplayName}" IsVisible="{Binding TeamMembers.Users[4].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[4], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[4], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -316,7 +317,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[5].DisplayName}" IsVisible="{Binding TeamMembers.Users[5].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[5], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[5], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -326,7 +327,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[6].DisplayName}" IsVisible="{Binding TeamMembers.Users[6].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[6], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[6], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -336,7 +337,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[7].DisplayName}" IsVisible="{Binding TeamMembers.Users[7].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[7], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[7], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -346,7 +347,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[8].DisplayName}" IsVisible="{Binding TeamMembers.Users[8].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[8], Mode=OneWay}"/>
+									<NumericUpDown Text="{Binding Days[8], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -356,7 +357,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[9].DisplayName}" IsVisible="{Binding TeamMembers.Users[9].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[9]}, Mode=OneWay"/>
+									<NumericUpDown Text="{Binding Days[9], Mode=OneWay}" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
