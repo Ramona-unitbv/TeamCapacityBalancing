@@ -32,6 +32,7 @@
 
         public User(string username)
         {
+            //Username = username;
             DisplayName = username;
         }
     }
