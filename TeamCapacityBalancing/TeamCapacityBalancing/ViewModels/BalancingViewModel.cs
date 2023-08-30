@@ -23,6 +23,9 @@ public sealed partial class BalancingViewModel : ObservableObject
     [ObservableProperty]
     public List<User> _team;
 
+    [ObservableProperty]
+    public List<float> _number=new() { 0,0,0,0,0,0,0,0,0,0};
+
     public BalancingViewModel()
     {
 
@@ -33,6 +36,7 @@ public sealed partial class BalancingViewModel : ObservableObject
         _pageService = pageService;
         _navigationService = navigationService;
         Pages = _pageService.Pages.Select(x => x.Value).Where(x => x.ViewModelType != this.GetType()).ToList();
+        ShowShortTermStoryes();
     }
 
     [ObservableProperty]
@@ -56,14 +60,30 @@ public sealed partial class BalancingViewModel : ObservableObject
                 new IssueData("Sample Story 1", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
             new UserStoryAssociation(
                 new IssueData("Sample Story 2", 8.0f, "Release 2", "Sprint 2", true, IssueData.IssueType.Story),
                 false,
                 5.0f,
-                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                60.0f
+            ),
+
+             new UserStoryAssociation(
+                new IssueData("Sample Story 3", 8.0f, "Release 2", "Sprint 2", true, IssueData.IssueType.Story),
+                true,
+                5.0f,
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                60.0f
+            ),
+
+              new UserStoryAssociation(
+                new IssueData("Sample Story 4", 8.0f, "Release 2", "Sprint 2", true, IssueData.IssueType.Story),
+                true,
+                5.0f,
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 60.0f
             ),
     };
@@ -74,22 +94,11 @@ public sealed partial class BalancingViewModel : ObservableObject
                 new IssueData("Balancing", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
     };
 
-    [RelayCommand]
-    public void OpenTeamPage()
-    {
-        Team = new();
-        if (_navigationService.Team is not null)
-            for (int i = 0; i < _navigationService.Team.Count; i++)
-            {
-                Team.Add(_navigationService.Team[i]);
-            }
-        _navigationService.CurrentPageType = typeof(TeamPage);
-    }
 
     public ObservableCollection<UserStoryAssociation> Totals { get; set; } = new ObservableCollection<UserStoryAssociation>
     {
@@ -97,21 +106,21 @@ public sealed partial class BalancingViewModel : ObservableObject
                 new IssueData("Total work open story", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
        new UserStoryAssociation(
                 new IssueData("Total work", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
        new UserStoryAssociation(
                 new IssueData("Total capacity", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
                 true,
                 3.0f,
-                new ObservableCollection<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 80.0f
             ),
     };
@@ -131,4 +140,50 @@ public sealed partial class BalancingViewModel : ObservableObject
                 new User("user9", "User Nine", 3,false),
                 new User("user10", "User Ten", 3,false),
             });
+
+    [ObservableProperty]
+    public ObservableCollection<UserStoryAssociation> _shortTermStoryes;
+
+    [RelayCommand]
+    public void OpenTeamPage()
+    {
+        _navigationService.CurrentPageType = typeof(TeamPage);
+    }
+
+    [RelayCommand]
+    public void OpenSprintSelection() 
+    {
+        _navigationService.CurrentPageType = typeof(SprintSelectionPage);
+    }
+
+    [RelayCommand]
+    public void ShowShortTermStoryes() 
+    {
+
+       
+        ShortTermStoryes = new();
+
+        for (int i = 0; i < MyUserAssociation.Count; i++) 
+        {
+            if (MyUserAssociation[i].ShortTerm) 
+            {
+                ShortTermStoryes.Add(MyUserAssociation[i]);
+            }
+        }
+
+   
+    }
+
+    [RelayCommand]
+    public void UncheckShortTermStory(string id) 
+    {
+        for (int i = 0; i < MyUserAssociation.Count; i++) 
+        {
+            if (MyUserAssociation[i].StoryData.Name == id) 
+            {
+                MyUserAssociation[i].ShortTerm = false;
+                ShortTermStoryes.Remove(MyUserAssociation[i]);
+            }
+        }
+    }
 }

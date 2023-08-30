@@ -74,7 +74,7 @@
 		</DataGrid>
 		<StackPanel Grid.Row="2" Height="100" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
 			<DatePicker Width="700" Height="40"/>
-			<Button Width="40" Height="40" Background="Transparent">
+			<Button Width="40" Height="40" Background="Transparent" Command="{Binding OpenBalancingPageCommand}">
 				<icons:MaterialIcon Width="40" Height="40" Kind="ArrowForward"/>
 			</Button>
 		</StackPanel>

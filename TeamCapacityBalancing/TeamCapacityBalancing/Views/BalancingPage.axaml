@@ -9,6 +9,7 @@
              x:Class="TeamCapacityBalancing.Views.BalancingPage"
 			 x:DataType="vm:BalancingViewModel"
 			 x:CompileBindings="True"
+			 x:Name="BalancingPageControl"
 			 >
 	<UserControl.DataContext>
 		<vm:BalancingViewModel/>
@@ -27,7 +28,7 @@
 			<Button Width="40" Height="40" Background="Transparent">
 				<icons:MaterialIcon Width="40" Height="40" Kind="ContentSave"/>
 			</Button>
-			<Button Width="40" Height="40" Background="Transparent">
+			<Button Width="40" Height="40" Background="Transparent" Command="{Binding OpenSprintSelectionCommand}">
 				<icons:MaterialIcon Width="40" Height="40" Kind="Calendar"/>
 			</Button>
 			<Button Width="40" Height="40" Background="Transparent" Command="{Binding OpenTeamPageCommand}">
@@ -42,8 +43,10 @@
 						  VerticalContentAlignment="Center"
 						  Content="Short-term"
 						  IsChecked="{Binding IsShortTermVisible}"
+						  Command="{Binding ShowShortTermStoryesCommand}"
 						  >
 			</ToggleButton>
+
 
 		</StackPanel>
 		<SplitView Grid.Row="1" OpenPaneLength="200" CompactPaneLength="35" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsPaneOpen="{Binding IsPaneOpen}" DisplayMode="{Binding Mode}">
@@ -105,7 +108,7 @@
 						<DataGridTemplateColumn Header="ShortTerm">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<CheckBox IsChecked="{Binding ShortTerm}" HorizontalAlignment="Center"/>
+									<CheckBox IsChecked="{Binding ShortTerm}" HorizontalAlignment="Center" Command="{ReflectionBinding #BalancingPageControl.DataContext.ShowShortTermStoryesCommand}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -125,7 +128,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[0].DisplayName}" IsVisible="{Binding TeamMembers.Users[0].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[0]}"/>
+									<NumericUpDown  Text="{Binding Days[0], }" Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -135,7 +138,7 @@
 						<DataGridTemplateColumn Header="{Binding TeamMembers.Users[1].DisplayName}" IsVisible="{Binding TeamMembers.Users[1].IsMember}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding Days[1]}"/>
+									<NumericUpDown Text="{Binding Days[1], Mode=OneWay}"  Minimum="0" Maximum="100" ShowButtonSpinner="False"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -231,7 +234,7 @@
 					</DataGrid.Columns>
 
 				</DataGrid>
-				<DataGrid Grid.Row="1" Height="150" ColumnWidth="*" IsVisible="{Binding IsShortTermVisible}" Items="{Binding MyUserAssociation}" AutoGenerateColumns="False" GridLinesVisibility="All" BorderThickness="1" BorderBrush="Gray">
+				<DataGrid Grid.Row="1" Height="150" ColumnWidth="*" IsVisible="{Binding IsShortTermVisible}" Items="{Binding  ShortTermStoryes}" AutoGenerateColumns="False" GridLinesVisibility="All" BorderThickness="1" BorderBrush="Gray">
 
 					<DataGrid.Columns>
 						<DataGridTemplateColumn Header="Story">
@@ -247,7 +250,7 @@
 						<DataGridTemplateColumn Header="ShortTerm">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<CheckBox IsChecked="{Binding ShortTerm}" HorizontalAlignment="Center"/>
+									<CheckBox IsChecked="{Binding ShortTerm}" HorizontalAlignment="Center" Command="{ReflectionBinding #BalancingPageControl.DataContext.UncheckShortTermStoryCommand}" CommandParameter="{Binding StoryData.Name}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
