@@ -58,15 +58,6 @@ namespace TeamCapacityBalancing
                     DataContext = serviceCollection.CreateService<MainWindowViewModel>(),
                 };
                 serviceCollection.AddSingleton(desktop.MainWindow);
-                IDataProvider p = new QueriesForDataBase();
-                List<IssueData> list = new();
-                list = p.GetAllEpicsByTeamLeader("JIRAUSER10101");
-                list = p.GetAllStoriesByTeamLeader("JIRAUSER10101");
-                list = p.GetStoriesByEpic(10030);
-                
-
-                
-
             }
 
             base.OnFrameworkInitializationCompleted();

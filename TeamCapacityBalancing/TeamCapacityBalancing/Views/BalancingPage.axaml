@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="using:TeamCapacityBalancing.ViewModels"
+			 xmlns:behaviors="clr-namespace:Avalonia.Controls.Behaviors;assembly=Avalonia.Controls.Behaviors"
 			 xmlns:models="using:TeamCapacityBalancing.Models"
              xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -20,11 +21,18 @@
 			<RowDefinition Height="8*"/>
 		</Grid.RowDefinitions>
 		<StackPanel Grid.Row="0" Orientation="Horizontal">
-			<ComboBox Width="300" Margin="5"/>
+			<ComboBox Width="300" Margin="5" SelectedItem="{Binding SelectedUser}" Items="{Binding AllUsers}" >
+				<ComboBox.ItemTemplate>
+					<DataTemplate>
+						<TextBlock Text="{Binding DisplayName}" />
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
+
 			<Button Width="40" Height="40" Background="Transparent">
 				<icons:MaterialIcon Width="40" Height="40" Kind="Refresh"/>
 			</Button>
-			<Button Width="40" Height="40" Background="Transparent">
+			<Button Width="40" Height="40" Background="Transparent" Command="{Binding VerificareCommand}">
 				<icons:MaterialIcon Width="40" Height="40" Kind="ContentSave"/>
 			</Button>
 			<Button Width="40" Height="40" Background="Transparent">
@@ -122,100 +130,100 @@
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[0].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[0].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[0].DisplayName}" IsVisible="{Binding TeamMembers[0].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days[0]}"/>
+									<!--<TextBox Text="{Binding Days[0]}"/>-->
+									<NumericUpDown Text="{Binding Days[0].Value, Mode=TwoWay}"></NumericUpDown>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[1].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[1].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[1].DisplayName}" IsVisible="{Binding TeamMembers[1].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[1], Mode=TwoWay}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[2].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[2].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[2].DisplayName}" IsVisible="{Binding TeamMembers[2].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[2]}"/>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+					<DataGrid.Columns>
+						<DataGridTemplateColumn Header="{Binding TeamMembers[3].DisplayName}" IsVisible="{Binding TeamMembers[3].HasTeam}">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate x:DataType="models:UserStoryAssociation">
+									<TextBox Text="{Binding Days[3]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[3].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[3].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[4].DisplayName}" IsVisible="{Binding TeamMembers[4].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[4]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[4].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[4].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[5].DisplayName}" IsVisible="{Binding TeamMembers[5].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[5]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[5].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[5].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[6].DisplayName}" IsVisible="{Binding TeamMembers[6].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[6]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[6].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[6].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[7].DisplayName}" IsVisible="{Binding TeamMembers[7].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[7]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[7].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[7].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[8].DisplayName}" IsVisible="{Binding TeamMembers[8].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[8]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[8].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[8].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[9].DisplayName}" IsVisible="{Binding TeamMembers[9].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
-								</DataTemplate>
-							</DataGridTemplateColumn.CellTemplate>
-						</DataGridTemplateColumn>
-					</DataGrid.Columns>
-
-					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[9].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[9].UserAndDays.IsShow}">
-							<DataGridTemplateColumn.CellTemplate>
-								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[9]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -238,7 +246,7 @@
 						<DataGridTemplateColumn Header="Story">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding StoryData.Name}"/>
+									<TextBlock Text="{Binding StoryData.Name}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -248,7 +256,7 @@
 						<DataGridTemplateColumn Header="ShortTerm">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<CheckBox IsChecked="{Binding ShortTerm}"/>
+									<CheckBox IsChecked="{Binding ShortTerm}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -258,107 +266,106 @@
 						<DataGridTemplateColumn Header="Remaining">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding Remaining}"/>
+									<TextBlock Text="{Binding Remaining}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[0].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[0].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[0].DisplayName}" IsVisible="{Binding TeamMembers[0].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[0]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[1].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[1].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[1].DisplayName}" IsVisible="{Binding TeamMembers[1].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[1]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[2].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[2].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[2].DisplayName}" IsVisible="{Binding TeamMembers[2].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[2]}"/>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+					<DataGrid.Columns>
+						<DataGridTemplateColumn Header="{Binding TeamMembers[3].DisplayName}" IsVisible="{Binding TeamMembers[3].HasTeam}">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate x:DataType="models:UserStoryAssociation">
+									<TextBox Text="{Binding Days[3]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[3].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[3].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[4].DisplayName}" IsVisible="{Binding TeamMembers[4].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[4]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[4].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[4].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[5].DisplayName}" IsVisible="{Binding TeamMembers[5].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[5]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[5].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[5].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[6].DisplayName}" IsVisible="{Binding TeamMembers[6].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[6]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[6].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[6].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[7].DisplayName}" IsVisible="{Binding TeamMembers[7].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[7]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[7].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[7].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[8].DisplayName}" IsVisible="{Binding TeamMembers[8].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[8]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[8].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[8].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[9].DisplayName}" IsVisible="{Binding TeamMembers[9].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
-								</DataTemplate>
-							</DataGridTemplateColumn.CellTemplate>
-						</DataGridTemplateColumn>
-					</DataGrid.Columns>
-
-					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[9].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[9].UserAndDays.IsShow}">
-							<DataGridTemplateColumn.CellTemplate>
-								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBox Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[9]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -368,7 +375,7 @@
 						<DataGridTemplateColumn Header="Coverage">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding Coverage}"/>
+									<TextBox Text="{Binding Coverage}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -383,7 +390,7 @@
 						<DataGridTemplateColumn Header="Story">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding StoryData.Name}"/>
+									<TextBlock Text="{Binding StoryData.Name}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -393,7 +400,7 @@
 						<DataGridTemplateColumn Header="ShortTerm">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<CheckBox IsVisible="False" IsChecked="{Binding ShortTerm}"/>
+									<CheckBox IsVisible="False" IsChecked="{Binding ShortTerm}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -403,107 +410,106 @@
 						<DataGridTemplateColumn Header="Remaining">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock IsVisible="False" Text="{Binding Remaining}"/>
+									<TextBlock IsVisible="False" Text="{Binding Remaining}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[0].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[0].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[0].DisplayName}" IsVisible="{Binding TeamMembers[0].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding  UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[0]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[1].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[1].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[1].DisplayName}" IsVisible="{Binding TeamMembers[1].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[1]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[2].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[2].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[2].DisplayName}" IsVisible="{Binding TeamMembers[2].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[2]}"/>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+					<DataGrid.Columns>
+						<DataGridTemplateColumn Header="{Binding TeamMembers[3].DisplayName}" IsVisible="{Binding TeamMembers[3].HasTeam}">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate x:DataType="models:UserStoryAssociation">
+									<TextBox Text="{Binding Days[3]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[3].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[3].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[4].DisplayName}" IsVisible="{Binding TeamMembers[4].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[4]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[4].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[4].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[5].DisplayName}" IsVisible="{Binding TeamMembers[5].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[5]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[5].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[5].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[6].DisplayName}" IsVisible="{Binding TeamMembers[6].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[6]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[6].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[6].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[7].DisplayName}" IsVisible="{Binding TeamMembers[7].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[7]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[7].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[7].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[8].DisplayName}" IsVisible="{Binding TeamMembers[8].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[8]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[8].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[8].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[9].DisplayName}" IsVisible="{Binding TeamMembers[9].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
-								</DataTemplate>
-							</DataGridTemplateColumn.CellTemplate>
-						</DataGridTemplateColumn>
-					</DataGrid.Columns>
-
-					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[9].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[9].UserAndDays.IsShow}">
-							<DataGridTemplateColumn.CellTemplate>
-								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[9]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -513,7 +519,7 @@
 						<DataGridTemplateColumn Header="Coverage">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock IsVisible="False" Text="{Binding Coverage}"/>
+									<TextBox IsVisible="False" Text="{Binding Coverage}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -528,7 +534,7 @@
 						<DataGridTemplateColumn Header="Story">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding StoryData.Name}"/>
+									<TextBlock Text="{Binding StoryData.Name}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -538,7 +544,7 @@
 						<DataGridTemplateColumn Header="ShortTerm">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<CheckBox IsVisible="False" IsChecked="{Binding ShortTerm}"/>
+									<CheckBox IsVisible="False" IsChecked="{Binding ShortTerm}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -548,107 +554,106 @@
 						<DataGridTemplateColumn Header="Remaining">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock IsVisible="False" Text="{Binding Remaining}"/>
+									<TextBlock IsVisible="False" Text="{Binding Remaining}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[0].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[0].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[0].DisplayName}" IsVisible="{Binding TeamMembers[0].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[0]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[1].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[1].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[1].DisplayName}" IsVisible="{Binding TeamMembers[1].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[1]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[2].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[2].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[2].DisplayName}" IsVisible="{Binding TeamMembers[2].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[2]}"/>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+					<DataGrid.Columns>
+						<DataGridTemplateColumn Header="{Binding TeamMembers[3].DisplayName}" IsVisible="{Binding TeamMembers[3].HasTeam}">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate x:DataType="models:UserStoryAssociation">
+									<TextBox Text="{Binding Days[3]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[3].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[3].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[4].DisplayName}" IsVisible="{Binding TeamMembers[4].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[4]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[4].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[4].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[5].DisplayName}" IsVisible="{Binding TeamMembers[5].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[5]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[5].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[5].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[6].DisplayName}" IsVisible="{Binding TeamMembers[6].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[6]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[6].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[6].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[7].DisplayName}" IsVisible="{Binding TeamMembers[7].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[7]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[7].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[7].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[8].DisplayName}" IsVisible="{Binding TeamMembers[8].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[8]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
 					</DataGrid.Columns>
 
 					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[8].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[8].UserAndDays.IsShow}">
+						<DataGridTemplateColumn Header="{Binding TeamMembers[9].DisplayName}" IsVisible="{Binding TeamMembers[9].HasTeam}">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
-								</DataTemplate>
-							</DataGridTemplateColumn.CellTemplate>
-						</DataGridTemplateColumn>
-					</DataGrid.Columns>
-
-					<DataGrid.Columns>
-						<DataGridTemplateColumn Header="{Binding MyUserAssociation[9].UserAndDays.User.DisplayName}" IsVisible="{Binding MyUserAssociation[9].UserAndDays.IsShow}">
-							<DataGridTemplateColumn.CellTemplate>
-								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding UserAndDays.Days}"/>
+									<TextBox Text="{Binding Days[9]}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -658,7 +663,7 @@
 						<DataGridTemplateColumn Header="Coverage">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock IsVisible="False" Text="{Binding Coverage}"/>
+									<TextBox IsVisible="False" Text="{Binding Coverage}"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>

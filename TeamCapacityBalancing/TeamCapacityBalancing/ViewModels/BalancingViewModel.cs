@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 using TeamCapacityBalancing.Models;
@@ -21,27 +23,53 @@ public sealed partial class BalancingViewModel : ObservableObject
 {
     private readonly PageService _pageService;
     private readonly NavigationService _navigationService;
+    private string teamLeaderName = "teamLeader";   //injected in constructor
+    private const int MaxNumberOfUsers = 10; 
+    private int EpicId = 10100;
+    private List<IssueData> stories = new List<IssueData>();
 
     //services
     private readonly IDataProvider _queriesForDataBase = new QueriesForDataBase();
     private readonly IDataSerialization _jsonSerialization = new JsonSerialization();
     public List<PageData> Pages { get; }
 
-    [ObservableProperty]
-    public List<User> _team;
-    public ObservableCollection<IssueData> Epics { get; set; } = new ObservableCollection<IssueData>();
 
+
+    [ObservableProperty]
+    public List<User> _allUsers;
+    public ObservableCollection<IssueData> Epics { get; set; } = new ObservableCollection<IssueData>();
     public BalancingViewModel()
     {
-        
+        GetTeamUsers();
+        if (File.Exists(JsonSerialization.UserStoryFilePath + teamLeaderName))
+        {
+            GetSerializedData();
+        }
+        else
+        {
+            PopulateByDefault();
+        }
+        AllUsers = _queriesForDataBase.GetAllUsers();
     }
 
-    public BalancingViewModel(PageService pageService,NavigationService navigationService)
+    public BalancingViewModel(PageService pageService, NavigationService navigationService)
     {
         _pageService = pageService;
         _navigationService = navigationService;
         Pages = _pageService.Pages.Select(x => x.Value).Where(x => x.ViewModelType != this.GetType()).ToList();
+
+        GetTeamUsers();
+        if (File.Exists(JsonSerialization.UserStoryFilePath + teamLeaderName))
+        {
+            GetSerializedData();
+        }
+        else
+        {
+            PopulateByDefault();
+        }
+        AllUsers = _queriesForDataBase.GetAllUsers();
     }
+       
 
     [ObservableProperty]
     private bool _isShortTermVisible = true;
@@ -55,47 +83,145 @@ public sealed partial class BalancingViewModel : ObservableObject
     [ObservableProperty]
     private bool _sumsOpen = true;
 
+    private User _selectedUser;
+    public User SelectedUser
+    {
+        get { return _selectedUser; }
+        set
+        {
+            if (_selectedUser != value)
+            {
+                _selectedUser = value;
+                List<IssueData> epics;
+                epics = _queriesForDataBase.GetAllEpicsByTeamLeader(SelectedUser);
+                if (epics != null)
+                {
+                    Epics = new ObservableCollection<IssueData>(epics);
+                    OnPropertyChanged("Epics");
+                }
+                OnPropertyChanged(nameof(SelectedUser));
+            }
+        }
+    }
+
     [ObservableProperty]
     private SplitViewDisplayMode _mode = SplitViewDisplayMode.CompactInline;
 
-    public ObservableCollection<UserStoryAssociation> MyUserAssociation { get; set; } = new ObservableCollection<UserStoryAssociation>
-            {
-                new UserStoryAssociation(new IssueData("Story 1"), true, 5.0f, new UserAssociation(new User("user1", "User One", 1), new List<float> { 1.5f, 2.0f, 1.0f }, true), 80.0f),
-                new UserStoryAssociation(new IssueData("Story 2"), false, 3.5f,new UserAssociation(new User("user2", "User Two", 2), new List < float > { 0.5f, 1.0f }, false), 60.0f),
-                new UserStoryAssociation(new IssueData("Story 3"), true, 7.0f, new UserAssociation(new User("user3", "User Three", 3), new List < float > { 2.0f, 2.5f, 2.5f, 1.0f }, false), 90.0f),
-                new UserStoryAssociation(new IssueData("Story 4"), false, 4.0f,new UserAssociation(new User("user4", "User Four", 4), new List < float > { 1.0f, 1.5f }, true), 40.0f),
-                new UserStoryAssociation(new IssueData("Story 5"), true, 6.5f, new UserAssociation(new User("user5", "User Five", 5), new List < float > { 2.5f, 1.5f, 2.5f }, false), 70.0f),
-                new UserStoryAssociation(new IssueData("Story 6"), true, 6.5f, new UserAssociation(new User("user5", "User Six", 5), new List < float > { 2.5f, 1.5f, 2.5f }, false), 70.0f),
-                new UserStoryAssociation(new IssueData("Story 7"), true, 6.5f, new UserAssociation(new User("user5", "User Seven", 5), new List < float > { 2.5f, 1.5f, 2.5f }, false), 70.0f),
-                new UserStoryAssociation(new IssueData("Story 8"), true, 6.5f, new UserAssociation(new User("user5", "User Eight", 5), new List < float > { 2.5f, 1.5f, 2.5f }, false), 70.0f),
-                new UserStoryAssociation(new IssueData("Story 9"), true, 6.5f, new UserAssociation(new User("user5", "User Nine", 5), new List < float > { 2.5f, 1.5f, 2.5f }, false), 70.0f),
-                new UserStoryAssociation(new IssueData("Story 10"), true, 6.5f, new UserAssociation(new User("user5", "User Ten", 5), new List < float > { 2.5f, 1.5f, 2.5f }, false), 70.0f),
-            };
-            
-      public ObservableCollection<UserStoryAssociation> Balancing { get; set; } = new ObservableCollection<UserStoryAssociation>
-            {
-                new UserStoryAssociation(new IssueData("Balancing"), true, 5.0f, new UserAssociation(new User("user1", "User One", 1), new List<float> { 1.5f, 2.0f, 1.0f }, true), 80.0f),
-            };
+    public ObservableCollection<UserStoryAssociation> MyUserAssociation { get; set; } = new ObservableCollection<UserStoryAssociation>();
+    
 
+    public ObservableCollection<UserStoryAssociation> Balancing { get; set; } = new ObservableCollection<UserStoryAssociation>
+    {
+           new UserStoryAssociation(
+                new IssueData("Balancing", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
+                true,
+                3.0f,
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+            ),
+    };
+
+    private void GetSerializedData()
+    {
+        List<UserStoryDataSerialization> userStoryDataSerializations = new();
+        userStoryDataSerializations = _jsonSerialization.DeserializeUserStoryData(teamLeaderName);
+        foreach(UserStoryDataSerialization ser in  userStoryDataSerializations)
+        {
+            List<float> capacityList = new List<float>();
+            for(int i =0; i<ser.UsersCapacity.Count; i++)
+            {
+                capacityList.Add(ser.UsersCapacity[i].Item2);
+            }
+            MyUserAssociation.Add(new UserStoryAssociation(ser.Story,ser.ShortTerm,ser.Remaining,capacityList));
+        }
+
+    }
+
+    private void GetTeamUsers()
+    {
+        TeamMembers = _jsonSerialization.DeserializeTeamData(teamLeaderName);
+        for(int i = TeamMembers.Count; i < MaxNumberOfUsers; i++)
+        {
+            User newUser = new User($"user {i}");
+            newUser.HasTeam = false;
+            TeamMembers.Add(newUser);
+        }
+    }
+
+    private void PopulateByDefault()
+    {
+        List<float> capacityList = new List<float>();
+        for (int i = 0; i < MaxNumberOfUsers; i++)
+        {
+            capacityList.Add(0);
+        }
+        stories = _queriesForDataBase.GetStoriesByEpic(EpicId);
+        
+
+        foreach(IssueData story in stories)
+        {
+            MyUserAssociation.Add(new UserStoryAssociation(story, false, story.Remaining, capacityList));
+        }
+        
+    }
     [RelayCommand]
-    public void OpenTeamPage()  
+    public void OpenTeamPage()
     {
         _navigationService.CurrentPageType = typeof(TeamPage);
     }
 
-    public ObservableCollection<UserStoryAssociation> Totals { get; set; } = new ObservableCollection<UserStoryAssociation>
-              {
-                new UserStoryAssociation(new IssueData("Total work open story"), true, 5.0f, new UserAssociation(new User("user1", "User One", 1), new List<float> { 1.5f, 2.0f, 1.0f }, true), 80.0f),
-                new UserStoryAssociation(new IssueData("Total work"), true, 5.0f, new UserAssociation(new User("user1", "User One", 1), new List<float> { 1.5f, 2.0f, 1.0f }, true), 80.0f),
-                new UserStoryAssociation(new IssueData("Total capacity"), true, 5.0f, new UserAssociation(new User("user1", "User One", 1), new List<float> { 1.5f, 2.0f, 1.0f }, true), 80.0f),
-            };
+    [RelayCommand]
 
-    public ObservableCollection<IssueData> Storyes { get; set; } = new() { new("Story 1"), new("Story 2"), new("Story 3") };
+    public void Verificare()
+    {
+        //facem
+    }
 
-    public Team TeamMembers { get; set; } = new Team(new List<User>
+    [RelayCommand]
+    public void SerializeOnSave()
+    {
+        List<UserStoryDataSerialization> userStoryDataSerializations = new List<UserStoryDataSerialization>();
+        foreach(UserStoryAssociation userStoryAssociation in MyUserAssociation)
+        {
+            List<Tuple<User, float>> capacityList = new List<Tuple<User, float>>();
+            for (int j = 0; j < stories.Count; j++)
             {
-                new User("user1", "User One", 1),
-                new User("user2", "User Two", 2),
-                new User("user3", "User Three", 3),
-            });
-}
+                for (int i = 0; i < MaxNumberOfUsers; i++)
+                {
+                    capacityList.Add(new Tuple<User, float>(TeamMembers[i], MyUserAssociation[j].Days[i].Value));
+                }
+            }
+            userStoryDataSerializations.Add(new UserStoryDataSerialization(userStoryAssociation.StoryData, userStoryAssociation.ShortTerm, userStoryAssociation.Remaining, capacityList));
+        }
+        _jsonSerialization.SerializeUserStoryData(userStoryDataSerializations, teamLeaderName);
+
+        _navigationService.CurrentPageType = typeof(TeamPage);
+    }
+
+    public ObservableCollection<UserStoryAssociation> Totals { get; set; } = new ObservableCollection<UserStoryAssociation>
+    {
+       new UserStoryAssociation(
+                new IssueData("Total work open story", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
+                true,
+                3.0f,
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+            ),
+       new UserStoryAssociation(
+                new IssueData("Total work", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
+                true,
+                3.0f,
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+            ),
+       new UserStoryAssociation(
+                new IssueData("Total capacity", 5.0f, "Release 1", "Sprint 1", true, IssueData.IssueType.Story),
+                true,
+                3.0f,
+                new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+            ),
+    };
+
+        public List<User> TeamMembers { get; set; } = new List<User>();
+    };
+
+
+   
+

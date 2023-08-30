@@ -8,9 +8,9 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         private static readonly object _lock = new object();
 
         private const string Host = "localhost";
-        private const string User = "Test";
-        private const string DBname = "jira";
-        private const string Password = "123";
+        private const string User = "postgres";
+        private const string DBname = "Jira";
+        private const string Password = "ciocanitoarea";
         private const string Port = "5432";
 
         private string connectionString = String.Format(
