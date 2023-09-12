@@ -1,7 +1,12 @@
 ﻿using Npgsql;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Reflection.PortableExecutable;
+using System.Xml.Linq;
 using TeamCapacityBalancing.Models;
+using TeamCapacityBalancing.Services.PostgresConnection;
 using TeamCapacityBalancing.Services.ServicesAbstractions;
 
 namespace TeamCapacityBalancing.Services.Postgres_connection
@@ -209,25 +214,24 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
 
             try
             {
-                using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
+                DataBaseConnectionBase dBConnection = DataBaseConnectionBaseFactory.GetMeTheRightConnection();
+                dBConnection.ConnectToJira();
+
+                if (!dBConnection.RunQuery(new PLQuery()))
+                    return users;
+
+                var item = dBConnection.NextRow();
+                while (item != null)
                 {
-                    connection.Open();
-
-                    var cmd = new NpgsqlCommand($@"SELECT Distinct cu.id, cu.user_name, cu.display_name
-                         FROM {JiraissueTable} AS i
-                        JOIN app_user AS au ON i.assignee = au.user_key 
-                        JOIN {UserTable} AS cu ON au.id = cu.id 
-                       WHERE i.issuetype = '{StoryIssueType}' AND i.summary LIKE '%#%'", connection);
-                    var reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        int id = reader.GetInt32(reader.GetOrdinal("id"));
-                        string username = reader.GetString(reader.GetOrdinal("user_name"));
-                        string displayName = reader.GetString(reader.GetOrdinal("display_name"));
-                        users.Add(new User(username, displayName, id));
-                    }
+                    int id = item.GetInt("id");
+                    string username = item.GetString("user_name");
+                    string displayName = item.GetString("display_name");
+                    users.Add(new User(username, displayName, id));
+                    item = dBConnection.NextRow();
                 }
+
+                dBConnection.DisconnectFromJira();
+
             }
             catch (Exception e)
             {
