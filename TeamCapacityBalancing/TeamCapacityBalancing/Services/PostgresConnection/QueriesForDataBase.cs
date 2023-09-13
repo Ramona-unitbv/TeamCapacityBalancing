@@ -166,40 +166,23 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
 
             try
             {
-                using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
+                DataBaseConnectionBase dBConnection = DataBaseConnectionBaseFactory.GetMeTheRightConnection();
+                dBConnection.ConnectToJira();
+
+                if (!dBConnection.RunQuery(new EpicsForPLQuery(teamLeader.Username)))
+                    return epics;
+
+                var item = dBConnection.NextRow();
+                while (item != null)
                 {
-                    connection.Open();
-
-                    var cmd = new NpgsqlCommand($@"
-                        SELECT {JiraissueTable}.id, {JiraissueTable}.assignee, {JiraissueTable}.issuenum, {JiraissueTable}.project, {JiraissueTable}.summary, {CustomFieldTable}.textvalue
-                        FROM {JiraissueTable}
-                        JOIN {CustomFieldTable} ON {CustomFieldTable}.issue = {JiraissueTable}.id
-                        WHERE {JiraissueTable}.id IN
-                        (SELECT {IssuelinkTable}.source
-                        FROM {IssuelinkTable}
-                        WHERE {IssuelinkTable}.destination IN
-                        (SELECT {JiraissueTable}.id
-                        FROM {JiraissueTable}
-                        WHERE {JiraissueTable}.assignee = 'JIRAUSER{teamLeader.Id}'
-                        AND {JiraissueTable}.issuetype = '{StoryIssueType}'
-                        AND {JiraissueTable}.summary LIKE '%#%'
-                        AND {CustomFieldTable}.textvalue is not null
-)
-                        
-        )", connection);
-
-                    var reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        int id = reader.GetInt32(reader.GetOrdinal("id"));
-                        string name = reader.GetString(reader.GetOrdinal("summary"));
-                        int issueNumber = reader.GetInt32(reader.GetOrdinal("issuenum"));
-                        int projectId = reader.GetInt32(reader.GetOrdinal("project"));
-                        string businesscase = reader.GetString(reader.GetOrdinal("textvalue"));
-                        epics.Add(new IssueData(id, name,businesscase));
-                    }
+                    int id = item.GetInt("id");
+                    string name = item.GetString("summary");
+                    int issueNumber = item.GetInt("issuenum");
+                    int projectId = item.GetInt("project");
+                    string businesscase = item.GetString("textvalue");
+                    epics.Add(new IssueData(id, name,businesscase));
                 }
+                
             }
             catch (Exception e)
             {
