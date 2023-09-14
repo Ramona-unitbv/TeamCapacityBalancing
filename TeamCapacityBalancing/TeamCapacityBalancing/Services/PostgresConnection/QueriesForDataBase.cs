@@ -179,8 +179,9 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                     string name = item.GetString("summary");
                     int issueNumber = item.GetInt("issuenum");
                     int projectId = item.GetInt("project");
-                    string businesscase = item.GetString("textvalue");
+                    string businesscase = item.GetString("customvalue");
                     epics.Add(new IssueData(id, name,businesscase));
+                    item = dBConnection.NextRow();
                 }
                 
             }

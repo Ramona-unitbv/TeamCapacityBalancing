@@ -20,12 +20,15 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         public const string JiraissueTable = databasePrefix + "jiraissue";
         public const string IssuelinkTable = databasePrefix + "issuelink";
         public const string CustomFieldValueTable = databasePrefix + "Customfieldvalue";
+        public const string CustomFieldOptionTable = databasePrefix + "Customfieldoption";
         public const string UserTable = databasePrefix + "cwd_user";
         public const string AppUserTable = databasePrefix + "app_user";
+
         public const string StoryIssueType = "7";
         public const string EpicStoryLinkType = "10200";
         public const string StoryTaskLinkType = "10100";
         public const string SubTaskIssueType = "10003";
+        public const string CustomFieldBusinessCase = "10105";
         public const string OpenStatus = "1";
         public const string Project = "12200";
         public DBQuery() {}
@@ -61,10 +64,11 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
             plid = PLID;
 
             Query = $@"
-                    SELECT i.id, i.assignee, i.issuenum, i.project, i.summary, cfv.stringvalue
+                    SELECT i.id, i.assignee, i.issuenum, i.project, i.summary, cfo.customvalue
                     FROM {JiraissueTable} AS i
                     JOIN {CustomFieldValueTable} AS cfv ON cfv.issue = i.id
-                    WHERE cfv.customfield = 13300 AND i.id IN
+                    JOIN {CustomFieldOptionTable} AS cfo ON cfv.stringvalue=cfo.id
+                    WHERE cfv.customfield = {CustomFieldBusinessCase} AND i.id IN
                     (SELECT i2.id
                     FROM {IssuelinkTable} AS il, {JiraissueTable} AS i2
                     WHERE i2.id = il.source AND  il.linktype = 10200 AND il.destination IN
@@ -81,7 +85,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 {"summary", "string" },
                 {"issuenum", "integer" },
                 {"project", "integer" },
-                {"stringvalue", "string"}
+                {"customvalue", "string"}
         };
     }
     }
