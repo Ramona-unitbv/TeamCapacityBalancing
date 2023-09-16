@@ -31,10 +31,10 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         public const string CustomFieldBusinessCase = "10105";
         public const string OpenStatus = "1";
         public const string Project = "12200";
-        public DBQuery() {}
+        public DBQuery() { Query = ""; QuerySchema = null; }
 
         public string Query { get; set; }
-        public DBQuerySchema QuerySchema { get; set; }
+        public DBQuerySchema? QuerySchema { get; set; }
     }
 
     class PLQuery : DBQuery
@@ -58,13 +58,10 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
 
     class EpicsForPLQuery : DBQuery
     {
-        private string plid;
         public EpicsForPLQuery(string PLID)
         {
-            plid = PLID;
-
             Query = $@"
-                    SELECT i.id, i.assignee, i.issuenum, i.project, i.summary, cfo.customvalue
+                    SELECT i.id, i.issuenum, i.summary, cfo.customvalue
                     FROM {JiraissueTable} AS i
                     JOIN {CustomFieldValueTable} AS cfv ON cfv.issue = i.id
                     JOIN {CustomFieldOptionTable} AS cfo ON cfv.stringvalue=cfo.id
@@ -74,7 +71,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                     WHERE i2.id = il.source AND  il.linktype = 10200 AND il.destination IN
                     (SELECT i3.id
                     FROM {JiraissueTable} AS i3
-                    WHERE i3.assignee = '{plid}'
+                    WHERE i3.assignee = '{PLID}'
                     AND i3.issuetype = '{StoryIssueType}'
                     AND i3.summary LIKE '%#%'
                     AND i.PROJECT = {Project}))";
@@ -84,9 +81,29 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 {"id", "integer" },
                 {"summary", "string" },
                 {"issuenum", "integer" },
-                {"project", "integer" },
                 {"customvalue", "string"}
         };
     }
+    }
+
+    class StoriesForPLQuery : DBQuery
+    {
+        public StoriesForPLQuery(string PLID)
+        {
+            Query = $@"
+                    SELECT istory.id, istory.issuenum, istory.summary, istory.assignee, iepic.id AS epicId
+                    FROM {JiraissueTable} AS istory, {JiraissueTable} AS iepic, {IssuelinkTable} AS il
+                    WHERE istory.assignee = '{PLID}'  AND il.source = iepic.id AND il.linktype = {EpicStoryLinkType} AND il.destination = istory.id
+                    AND istory.issuetype = '{StoryIssueType}' AND istory.PROJECT = {Project}";
+
+            QuerySchema = new DBQuerySchema()
+            {
+                {"id", "integer" },
+                {"summary", "string" },
+                {"assignee", "string" },
+                {"issuenum", "integer" },
+                {"epicId", "integer" },
+        };
+        }
     }
 }

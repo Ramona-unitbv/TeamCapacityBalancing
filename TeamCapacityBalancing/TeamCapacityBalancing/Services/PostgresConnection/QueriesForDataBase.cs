@@ -11,6 +11,18 @@ using TeamCapacityBalancing.Services.ServicesAbstractions;
 
 namespace TeamCapacityBalancing.Services.Postgres_connection
 {
+    public class TeamLeaderInfo
+    {
+        private readonly string _name;
+        private List<IssueData> _epics = new List<IssueData>();
+        private List<IssueData> _stories = new List<IssueData>();
+        public TeamLeaderInfo(string name) { _name = name; }
+
+        public string Name { get { return _name; } }
+        public List<IssueData> Epics { get => _epics; set { _epics = value; } }
+        public List<IssueData> Stories { get => _stories; set { _stories = value; } }
+
+    }
     public class QueriesForDataBase : IDataProvider
     {
         private const string JiraissueTable = "jiraissue";
@@ -23,6 +35,8 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         private const string SubTaskIssueType = "10003";
         private const string OpenStatus = "1";
 
+        private List<User> teamLeaders = new List<User>();
+        private Dictionary<string, TeamLeaderInfo> teamLeadersInfos = new Dictionary<string, TeamLeaderInfo>();
 
         private float CalculateRemainingTimeForStory(int storyId)
         {
@@ -53,35 +67,48 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
             return (timeEstimate +timeSpent)-timeSpent;
         }
 
-        private int GetEpicIdFromStory(int storyId)
+        //private int GetEpicIdFromStory(int storyId)
+        //{
+        //    int epicId = 0;
+        //    try
+        //    {
+        //        using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
+        //        {
+        //            connection.Open();
+
+        //            var cmd = new NpgsqlCommand($"SELECT {IssuelinkTable}.source " +
+        //                $"FROM {IssuelinkTable} " +
+        //                $"WHERE {IssuelinkTable}.linktype = {EpicStoryLinkType} " +
+        //                $"AND {IssuelinkTable}.destination = {storyId}", connection);
+        //            var reader = cmd.ExecuteReader();
+
+        //            while (reader.Read())
+        //            {
+        //                epicId = reader.GetInt32(reader.GetOrdinal("source"));
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //    }
+
+        //    return epicId;
+        //}
+
+        private TeamLeaderInfo GetTeamLeaderInfo(string teamLeader)
         {
-            int epicId = 0;
-            try
-            {
-                using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
-                {
-                    connection.Open();
+            TeamLeaderInfo? teamLeaderInfo;
+            teamLeadersInfos.TryGetValue(teamLeader, out teamLeaderInfo);
 
-                    var cmd = new NpgsqlCommand($"SELECT {IssuelinkTable}.source " +
-                        $"FROM {IssuelinkTable} " +
-                        $"WHERE {IssuelinkTable}.linktype = {EpicStoryLinkType} " +
-                        $"AND {IssuelinkTable}.destination = {storyId}", connection);
-                    var reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        epicId = reader.GetInt32(reader.GetOrdinal("source"));
-                    }
-                }
-            }
-            catch (Exception e)
+            if (teamLeaderInfo == null)
             {
-                Console.WriteLine(e.Message);
+                teamLeaderInfo = new TeamLeaderInfo(teamLeader);
+                teamLeadersInfos.Add(teamLeader, teamLeaderInfo);
             }
 
-            return epicId;
+            return teamLeaderInfo;
         }
-
         public List<User> GetAllUsers()
         {
             List<User> users = new List<User>();
@@ -116,40 +143,40 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
 
         public List<IssueData> GetAllStoriesByTeamLeader(User teamLeader)
         {
+            TeamLeaderInfo teamLeaderInfo = GetTeamLeaderInfo(teamLeader.Username);
+
+            if (teamLeaderInfo.Stories.Count > 0)
+            {
+                return teamLeaderInfo.Stories;
+            }
+
             List<IssueData> stories = new List<IssueData>();
 
             try
             {
-                using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
+                DataBaseConnectionBase dBConnection = DataBaseConnectionBaseFactory.GetMeTheRightConnection();
+                dBConnection.ConnectToJira();
+
+                if (!dBConnection.RunQuery(new StoriesForPLQuery(teamLeader.Username)))
+                    return stories;
+
+                var item = dBConnection.NextRow();
+                while (item != null)
                 {
-                    connection.Open();
+                    int id = item.GetInt("id");
+                    string name = item.GetString("summary");
+                    string assignee = item.GetString("assignee");
+                    int issueNumber = item.GetInt("issuenum");
+                    int epicId = item.GetInt("epicId");
 
-                    var cmd = new NpgsqlCommand($"SELECT {JiraissueTable}.id, {JiraissueTable}.assignee, {JiraissueTable}.issuenum, {JiraissueTable}.project, {JiraissueTable}.summary " +
-                        $"From {JiraissueTable} " +
-                        $"where {JiraissueTable}.assignee = 'JIRAUSER{teamLeader.Id}' " +
-                        $"and {JiraissueTable}.issuetype = '{StoryIssueType}' " +
-                        $"group by {JiraissueTable}.id", connection);
+                    float remaining = 100; // ((CalculateRemainingTimeForStory(id) / 60) / 60) / 8; //from seconds to days
+                    Math.Round(remaining, 2);
 
-                    var reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
+                    if (remaining > 0)
                     {
-                        int id = reader.GetInt32(reader.GetOrdinal("id"));
-                        string name = reader.GetString(reader.GetOrdinal("summary"));
-                        string assignee = reader.GetString(reader.GetOrdinal("assignee"));
-                        int issueNumber = reader.GetInt32(reader.GetOrdinal("issuenum"));
-                        int projectId = reader.GetInt32(reader.GetOrdinal("project"));
-                        int epicId = GetEpicIdFromStory(id);
-
-                        float remaining = ((CalculateRemainingTimeForStory(id) / 60) / 60) / 8; //from seconds to days
-                        Math.Round(remaining, 2);
-
-                        if (remaining > 0)
-                        {
-                            stories.Add(new IssueData(id, name, assignee, remaining, epicId));
-                        }
-
+                        stories.Add(new IssueData(id, name, assignee, remaining, epicId));
                     }
+                    item = dBConnection.NextRow();
                 }
             }
             catch (Exception e)
@@ -157,11 +184,20 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 Console.WriteLine(e.Message);
             }
 
+            teamLeaderInfo.Stories = stories;
+
             return stories;
         }
 
         public List<IssueData> GetAllEpicsByTeamLeader(User teamLeader)
         {
+            TeamLeaderInfo teamLeaderInfo = GetTeamLeaderInfo(teamLeader.Username);
+
+            if (teamLeaderInfo.Epics.Count > 0)
+            {
+                return teamLeaderInfo.Epics;
+            }
+
             List<IssueData> epics = new List<IssueData>();
 
             try
@@ -178,9 +214,8 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                     int id = item.GetInt("id");
                     string name = item.GetString("summary");
                     int issueNumber = item.GetInt("issuenum");
-                    int projectId = item.GetInt("project");
                     string businesscase = item.GetString("customvalue");
-                    epics.Add(new IssueData(id, name,businesscase));
+                    epics.Add(new IssueData(id, name, businesscase));
                     item = dBConnection.NextRow();
                 }
                 
@@ -190,11 +225,14 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 Console.WriteLine(e.Message);
             }
 
+            teamLeaderInfo.Epics = epics;
+
             return epics;
         }
         public List<User> GetAllTeamLeaders()
         {
-            List<User> users = new List<User>();
+            if (teamLeaders.Count > 0)
+                return teamLeaders;
 
             try
             {
@@ -202,7 +240,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 dBConnection.ConnectToJira();
 
                 if (!dBConnection.RunQuery(new PLQuery()))
-                    return users;
+                    return teamLeaders;
 
                 var item = dBConnection.NextRow();
                 while (item != null)
@@ -210,7 +248,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                     int id = item.GetInt("id");
                     string username = item.GetString("user_name");
                     string displayName = item.GetString("display_name");
-                    users.Add(new User(username, displayName, id));
+                    teamLeaders.Add(new User(username, displayName, id));
                     item = dBConnection.NextRow();
                 }
 
@@ -222,37 +260,37 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 Console.WriteLine(e.Message);
             }
 
-            return users;
+            return teamLeaders;
         }
         public List<OpenTasksUserAssociation> GetRemainingForUser()
         {
             List<OpenTasksUserAssociation> openTasks= new List<OpenTasksUserAssociation>();
             try
             {
-                using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
-                {
-                    connection.Open();
-                    var cmd = new NpgsqlCommand($@"SELECT ji.assignee AS User, au.id, cu.user_name, cu.display_name,
-                        SUM(((ji.timeestimate + ji.timespent) - ji.timespent) / 60 / 60 / 8) AS TotalRemaining 
-                        FROM {JiraissueTable} AS ji
-                        JOIN app_user AS au ON au.user_key = ji.assignee
-                        JOIN {UserTable} AS cu ON cu.id = au.id 
-                        WHERE ji.issuetype = '{SubTaskIssueType}' 
-                        AND ji.assignee IS NOT NULL 
-                        AND ji.issuestatus = '{OpenStatus}' 
-                        GROUP BY ji.assignee, cu.user_name, au.id, cu.display_name", connection);
+                //using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
+                //{
+                //    connection.Open();
+                //    var cmd = new NpgsqlCommand($@"SELECT ji.assignee AS User, au.id, cu.user_name, cu.display_name,
+                //        SUM(((ji.timeestimate + ji.timespent) - ji.timespent) / 60 / 60 / 8) AS TotalRemaining 
+                //        FROM {JiraissueTable} AS ji
+                //        JOIN app_user AS au ON au.user_key = ji.assignee
+                //        JOIN {UserTable} AS cu ON cu.id = au.id 
+                //        WHERE ji.issuetype = '{SubTaskIssueType}' 
+                //        AND ji.assignee IS NOT NULL 
+                //        AND ji.issuestatus = '{OpenStatus}' 
+                //        GROUP BY ji.assignee, cu.user_name, au.id, cu.display_name", connection);
 
-                    var reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        int id=  reader.GetInt32(reader.GetOrdinal("id"));
-                        string username = reader.GetString(reader.GetOrdinal("user_name"));
-                        string displayName = reader.GetString(reader.GetOrdinal("display_name"));
-                        User user= new User(username, displayName, id);
-                        float remaining = reader.GetFloat(reader.GetOrdinal("totalremaining"));
-                        openTasks.Add(new OpenTasksUserAssociation(user, (float)Math.Round(remaining,2)));
-                    }
-                }
+                //    var reader = cmd.ExecuteReader();
+                //    while (reader.Read())
+                //    {
+                //        int id=  reader.GetInt32(reader.GetOrdinal("id"));
+                //        string username = reader.GetString(reader.GetOrdinal("user_name"));
+                //        string displayName = reader.GetString(reader.GetOrdinal("display_name"));
+                //        User user= new User(username, displayName, id);
+                //        float remaining = reader.GetFloat(reader.GetOrdinal("totalremaining"));
+                //        openTasks.Add(new OpenTasksUserAssociation(user, (float)Math.Round(remaining,2)));
+                //    }
+                //}
             }
             catch (Exception e)
             {
