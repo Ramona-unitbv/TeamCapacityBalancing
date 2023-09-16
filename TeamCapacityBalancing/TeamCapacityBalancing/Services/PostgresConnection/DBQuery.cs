@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Avalonia.Animation;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -91,9 +92,9 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         public StoriesForPLQuery(string PLID)
         {
             Query = $@"
-                    SELECT istory.id, istory.issuenum, istory.summary, istory.assignee, iepic.id AS epicId
+                    SELECT istory.id, istory.issuenum, istory.summary, istory.assignee, iepic.id AS epicId, istory.timeestimate
                     FROM {JiraissueTable} AS istory, {JiraissueTable} AS iepic, {IssuelinkTable} AS il
-                    WHERE istory.assignee = '{PLID}'  AND il.source = iepic.id AND il.linktype = {EpicStoryLinkType} AND il.destination = istory.id
+                    WHERE istory.assignee = '{PLID}'  AND il.source = iepic.id AND il.linktype = {EpicStoryLinkType} AND il.destination = istory.id AND istory.timeestimate > 0
                     AND istory.issuetype = '{StoryIssueType}' AND istory.PROJECT = {Project}";
 
             QuerySchema = new DBQuerySchema()
@@ -103,6 +104,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 {"assignee", "string" },
                 {"issuenum", "integer" },
                 {"epicId", "integer" },
+                {"timeestimate", "integer" }
         };
         }
     }

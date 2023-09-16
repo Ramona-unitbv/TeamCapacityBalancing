@@ -168,8 +168,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                     string assignee = item.GetString("assignee");
                     int issueNumber = item.GetInt("issuenum");
                     int epicId = item.GetInt("epicId");
-
-                    float remaining = 100; // ((CalculateRemainingTimeForStory(id) / 60) / 60) / 8; //from seconds to days
+                    float remaining = item.GetInt("timeestimate") / 60 / 60 / 8; //from seconds to days
                     Math.Round(remaining, 2);
 
                     if (remaining > 0)
