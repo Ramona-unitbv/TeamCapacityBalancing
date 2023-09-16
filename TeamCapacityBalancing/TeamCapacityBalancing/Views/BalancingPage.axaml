@@ -120,7 +120,7 @@
 						
 						<StackPanel Grid.Row="1" Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,10,0,0">
 							<TextBlock Text="Filters" Margin="0,0,0,5"/>
-							<ComboBox Width="150" Margin="0,0,0,5" SelectedItem="{Binding FilterString}" Items="{Binding BusinessCase}" PlaceholderText="None">
+							<ComboBox Width="180" Margin="0,0,0,5" SelectedItem="{Binding FilterString}" Items="{Binding BusinessCase}" PlaceholderText="Non-generic Epics">
 								<ComboBox.ItemTemplate>
 									<DataTemplate x:DataType="vm:BalancingViewModel">
 										<StackPanel  Orientation="Horizontal">

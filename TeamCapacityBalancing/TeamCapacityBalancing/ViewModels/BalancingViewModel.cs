@@ -69,6 +69,7 @@ public sealed partial class BalancingViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<User> _teamMembers;
 
+    private readonly HashSet<string> _genericEpics = new HashSet<string>() { "ABSENT", "OPER", "MAINT", "STRAT", "ALL" };
 
     //Properties
     public ObservableCollection<IssueData> Epics { get; set; } = new();
@@ -191,7 +192,7 @@ public sealed partial class BalancingViewModel : ObservableObject
         MyUserAssociation.Clear();
         allUserStoryAssociation.Clear();
         BusinessCase.Clear();
-        FilterString = "None";
+        FilterString = "Non-generic Epics";
         businessCaseSet.Clear();
         List<IssueData> epics;
         epics = _queriesForDataBase.GetAllEpicsByTeamLeader(SelectedUser);
@@ -376,6 +377,10 @@ public sealed partial class BalancingViewModel : ObservableObject
 
     private void GetBusinessCaseForEpics()
     {
+        BusinessCase.Add("None");
+        BusinessCase.Add("Place Holders");
+        BusinessCase.Add("Generic Epics");
+        BusinessCase.Add("Non-generic Epics");
         foreach (var epic in Epics)
         {
             if (epic.BusinessCase != null)
@@ -388,8 +393,7 @@ public sealed partial class BalancingViewModel : ObservableObject
         {
             BusinessCase.Add(businessCase);
         }
-        BusinessCase.Add("PlaceHolder");
-        BusinessCase.Add("None");
+
     }
 
     private List<Tuple<User, float>> GenerateDefaultDays()
@@ -415,14 +419,22 @@ public sealed partial class BalancingViewModel : ObservableObject
         }
     }
 
-    private void DisplayStoriesFromAnEpic(int epicId)
+    private List<UserStoryAssociation> GetUserStoryAssociationsForEpic(int epicId)
     {
-        MyUserAssociation.Clear();
+        List < UserStoryAssociation > associations = new List <UserStoryAssociation>();
         for (int allUserStoryAssociationIndex = 0; allUserStoryAssociationIndex < allUserStoryAssociation.Count; allUserStoryAssociationIndex++)
         {
             if (allUserStoryAssociation[allUserStoryAssociationIndex].StoryData.EpicID == epicId)
-                MyUserAssociation.Add(allUserStoryAssociation[allUserStoryAssociationIndex]);
+                associations.Add(allUserStoryAssociation[allUserStoryAssociationIndex]);
         }
+        return associations;
+    }
+
+    private void DisplayStoriesFromAnEpic(int epicId)
+    {
+        MyUserAssociation.Clear();
+        foreach (var association in GetUserStoryAssociationsForEpic(epicId))
+            MyUserAssociation.Add(association);
     }
 
     public List<Tuple<User, float>> CalculateBalancing(bool shortTerm)
@@ -591,7 +603,24 @@ public sealed partial class BalancingViewModel : ObservableObject
         List<IssueData> epics = _queriesForDataBase.GetAllEpicsByTeamLeader(SelectedUser);
         foreach (var item in epics)
         {
-            Epics.Add(item);
+            if (GetUserStoryAssociationsForEpic(item.Id).Count > 0)
+                Epics.Add(item);
+        }
+    }
+
+    private void RefreshUserAssociations()
+    {
+        HashSet<int> epicIDs = new HashSet<int>();
+        foreach(var epic in Epics)
+        {
+            epicIDs.Add(epic.Id);
+        }
+        
+        MyUserAssociation.Clear();
+        foreach (var asoc in allUserStoryAssociation)
+        {
+            if (epicIDs.Contains(asoc.StoryData.EpicID.GetValueOrDefault()))
+                MyUserAssociation.Add(asoc);
         }
     }
     
@@ -623,7 +652,7 @@ public sealed partial class BalancingViewModel : ObservableObject
 
                 break;
 
-            case "PlaceHolder":
+            case "Place Holders":
                 RepopulateEpics();
                 MyUserAssociation.Clear();
                 foreach (UserStoryAssociation userStoryAssociation in allUserStoryAssociation)
@@ -639,49 +668,47 @@ public sealed partial class BalancingViewModel : ObservableObject
                     }
                 }
                 break;
-            
 
+            case "Generic Epics":
+                RepopulateEpics();
+
+                for (int issueIndex = 0; issueIndex < Epics.Count; issueIndex++)
+                {
+                    if (!_genericEpics.Contains(Epics[issueIndex].BusinessCase))
+                    {
+                        Epics.Remove(Epics[issueIndex]);
+                        issueIndex--;
+                    }
+                }
+                RefreshUserAssociations();
+                break;
+
+            case "Non-generic Epics":
+                RepopulateEpics();
+
+                for (int issueIndex = 0; issueIndex < Epics.Count; issueIndex++)
+                {
+                    if (_genericEpics.Contains(Epics[issueIndex].BusinessCase))
+                    {
+                        Epics.Remove(Epics[issueIndex]);
+                        issueIndex--;
+                    }
+                }
+                RefreshUserAssociations();
+                break;            
+            
             default:
                 RepopulateEpics();
+                
                 for (int issueIndex = 0; issueIndex < Epics.Count; issueIndex++)
                 {
                     if (Epics[issueIndex].BusinessCase != FilterString)
                     {
-
-                        if (MyUserAssociation.Count > 0 && MyUserAssociation.First().StoryData.EpicID == Epics[issueIndex].Id && MyUserAssociation.Count != allUserStoryAssociation.Count)
-                            MyUserAssociation.Clear();
-
                         Epics.Remove(Epics[issueIndex]);
                         issueIndex--;
                     }
-
-                    if(MyUserAssociation.Count == 0)
-                    {
-                        foreach(var asoc in allUserStoryAssociation)
-                        {
-                            MyUserAssociation.Add(asoc);
-                        }
-                    }
                 }
-
-                if (MyUserAssociation.Count == allUserStoryAssociation.Count)
-                {
-                    for (int userStoryAssociationIndex = 0; userStoryAssociationIndex < MyUserAssociation.Count; ++userStoryAssociationIndex)
-                    {
-                        int issueIndex;
-                        for (issueIndex = 0; issueIndex < Epics.Count; issueIndex++)
-                        {
-                            if (MyUserAssociation[userStoryAssociationIndex].StoryData.EpicID == Epics[issueIndex].Id)
-                                break;
-                        }
-                        if (issueIndex == Epics.Count)
-                        {
-                            MyUserAssociation.Remove(MyUserAssociation[userStoryAssociationIndex]);
-                            userStoryAssociationIndex--;
-                        }
-
-                    }
-                }
+                RefreshUserAssociations();
                 break;
 
 
