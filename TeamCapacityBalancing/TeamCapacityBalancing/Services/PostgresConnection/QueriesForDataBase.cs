@@ -38,64 +38,6 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         private List<User> teamLeaders = new List<User>();
         private Dictionary<string, TeamLeaderInfo> teamLeadersInfos = new Dictionary<string, TeamLeaderInfo>();
 
-        private float CalculateRemainingTimeForStory(int storyId)
-        {
-            float timeEstimate = 0;
-            float timeSpent = 0;
-            try
-            {
-                using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
-                {
-                    connection.Open();
-
-                    var cmd = new NpgsqlCommand($"SELECT {JiraissueTable}.timeestimate, {JiraissueTable}.timespent " +
-                        $"FROM {JiraissueTable} " +
-                        $"WHERE {JiraissueTable}.id = {storyId} ", connection);
-                    var reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        timeEstimate += reader.GetInt32(reader.GetOrdinal("timeestimate"));
-                        timeSpent += reader.GetInt32(reader.GetOrdinal("timespent"));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            return (timeEstimate +timeSpent)-timeSpent;
-        }
-
-        //private int GetEpicIdFromStory(int storyId)
-        //{
-        //    int epicId = 0;
-        //    try
-        //    {
-        //        using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
-        //        {
-        //            connection.Open();
-
-        //            var cmd = new NpgsqlCommand($"SELECT {IssuelinkTable}.source " +
-        //                $"FROM {IssuelinkTable} " +
-        //                $"WHERE {IssuelinkTable}.linktype = {EpicStoryLinkType} " +
-        //                $"AND {IssuelinkTable}.destination = {storyId}", connection);
-        //            var reader = cmd.ExecuteReader();
-
-        //            while (reader.Read())
-        //            {
-        //                epicId = reader.GetInt32(reader.GetOrdinal("source"));
-        //            }
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine(e.Message);
-        //    }
-
-        //    return epicId;
-        //}
-
         private TeamLeaderInfo GetTeamLeaderInfo(string teamLeader)
         {
             TeamLeaderInfo? teamLeaderInfo;
@@ -115,22 +57,24 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
 
             try
             {
-                using (var connection = new NpgsqlConnection(DataBaseConnection.GetInstance().GetConnectionString()))
+
+                DataBaseConnectionBase dBConnection = DataBaseConnectionBaseFactory.GetMeTheRightConnection();
+                dBConnection.ConnectToJira();
+
+                if (!dBConnection.RunQuery(new UsersQuery()))
+                    return users;
+
+                var item = dBConnection.NextRow();
+                while (item != null)
                 {
-                    connection.Open();
+                    string username = item.GetString("user_name");
+                    string displayName = item.GetString("display_name");
+                    int id = item.GetInt("id");
+                    users.Add(new User(username, displayName, id));
 
-                    var cmd = new NpgsqlCommand("SELECT user_name, display_name, id " +
-                        "FROM " + UserTable, connection);
-                    var reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        string username = reader.GetString(reader.GetOrdinal("user_name"));
-                        string displayName = reader.GetString(reader.GetOrdinal("display_name"));
-                        int id = reader.GetInt32(reader.GetOrdinal("id"));
-                        users.Add(new User(username, displayName, id));
-                    }
+                    item = dBConnection.NextRow();
                 }
+
             }
             catch (Exception e)
             {

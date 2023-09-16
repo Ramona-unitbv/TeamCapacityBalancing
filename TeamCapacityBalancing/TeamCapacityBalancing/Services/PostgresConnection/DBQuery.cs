@@ -108,4 +108,23 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         };
         }
     }
+
+    class UsersQuery : DBQuery
+    {
+        public UsersQuery()
+        {
+            Query = $@"
+                    SELECT Distinct u.user_name, u.display_name, u.id 
+                    FROM {UserTable} AS u, {JiraissueTable} AS i
+                    WHERE i.assignee = u.user_name AND i.PROJECT = {Project}
+                    ORDER By u.display_name";
+
+            QuerySchema = new DBQuerySchema()
+            {
+                {"id", "integer" },
+                {"user_name", "string" },
+                {"display_name", "string" }
+        };
+        }
+    }
 }
