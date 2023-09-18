@@ -250,7 +250,7 @@ public sealed partial class BalancingViewModel : ObservableObject
             {
                 capacityList.Add(new Tuple<User, float>(TeamMembers[i], allUserStoryAssociation[j].Days[i].Value));
             }
-            userStoryDataSerializations.Add(new UserStoryDataSerialization(allUserStoryAssociation[j].StoryData, allUserStoryAssociation[j].ShortTerm, allUserStoryAssociation[j].Remaining, capacityList));
+            userStoryDataSerializations.Add(new UserStoryDataSerialization(allUserStoryAssociation[j].StoryData, allUserStoryAssociation[j].ShortTerm, allUserStoryAssociation[j].Remaining.GetValue(), capacityList));
         }
         if(SelectedUser!= null) 
         _jsonSerialization.SerializeUserStoryData(userStoryDataSerializations, SelectedUser.Username);
@@ -258,7 +258,6 @@ public sealed partial class BalancingViewModel : ObservableObject
 
     private void GetSerializedData()
     {
-
         List<UserStoryDataSerialization> userStoryDataSerializations = new();
         userStoryDataSerializations = _jsonSerialization.DeserializeUserStoryData(SelectedUser.Username);
         foreach (UserStoryDataSerialization ser in userStoryDataSerializations)
@@ -480,7 +479,7 @@ public sealed partial class BalancingViewModel : ObservableObject
                         foreach (var day in item.Days)
                             if (member.Username == day.UserName)
                             {
-                                totalSum += day.Value * item.Remaining;
+                                totalSum += day.Value * item.Remaining.GetValue();
                             }
                     }
                 openstories.Add(Tuple.Create(member, (float)Math.Round(totalSum / 100, 2)));
@@ -497,7 +496,7 @@ public sealed partial class BalancingViewModel : ObservableObject
                         foreach (var day in item.Days)
                             if (member.Username == day.UserName)
                             {
-                                totalSum += day.Value * item.Remaining;
+                                totalSum += day.Value * item.Remaining.GetValue();
                             }
                     }
                 openstories.Add(Tuple.Create(member, (float)Math.Round(totalSum / 100, 2)));
@@ -722,10 +721,16 @@ public sealed partial class BalancingViewModel : ObservableObject
 
         foreach (var story in allStories)
         {
-            if (allUserStoryAssociation.FirstOrDefault(u => u.StoryData.Id == story.Id) == null)
+            var asoc = allUserStoryAssociation.FirstOrDefault(u => u.StoryData.Id == story.Id);
+            if (asoc == null)
             {
                 allUserStoryAssociation.Add(new UserStoryAssociation(story, false, story.Remaining, capacityList, MaxNumberOfUsers));
                 MyUserAssociation.Add(allUserStoryAssociation.Last());
+            }
+            else
+            {
+                asoc.Remaining = new Wrapper<float>() { Value = story.Remaining };
+                asoc.StoryData.Remaining = story.Remaining;
             }
         }
     }
@@ -890,6 +895,7 @@ public sealed partial class BalancingViewModel : ObservableObject
 
         allUserStoryAssociation.Clear();
 
+        _queriesForDataBase.RefreshTeamLeader(SelectedUser);
         allStories = _queriesForDataBase.GetAllStoriesByTeamLeader(SelectedUser);
 
         ShowAllStories();

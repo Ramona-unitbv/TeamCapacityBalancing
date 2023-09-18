@@ -5,6 +5,7 @@ namespace TeamCapacityBalancing.Services.ServicesAbstractions
 {
     public interface IDataProvider
     {
+        public void RefreshTeamLeader(User teamLeader);
         public List<IssueData> GetAllEpicsByTeamLeader(User teamLeader);
         public List<IssueData> GetAllStoriesByTeamLeader(User teamLeader);
         public List<User> GetAllUsers();

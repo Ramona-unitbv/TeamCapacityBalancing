@@ -38,6 +38,11 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         private List<User> teamLeaders = new List<User>();
         private Dictionary<string, TeamLeaderInfo> teamLeadersInfos = new Dictionary<string, TeamLeaderInfo>();
 
+        public void RefreshTeamLeader(User teamLeader)
+        {
+            teamLeadersInfos.Remove(teamLeader.Username);
+        }
+
         private TeamLeaderInfo GetTeamLeaderInfo(string teamLeader)
         {
             TeamLeaderInfo? teamLeaderInfo;

@@ -177,7 +177,7 @@
 						<DataGridTemplateColumn Header="Remaining(days)">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding Remaining}" HorizontalAlignment="Center"/>
+									<TextBlock Text="{Binding Remaining.Value}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>

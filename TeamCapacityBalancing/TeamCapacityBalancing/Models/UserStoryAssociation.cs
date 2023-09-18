@@ -37,7 +37,7 @@ public class Wrapper<T> : Utility
 public partial class UserStoryAssociation : ObservableObject
 {
     public IssueData StoryData { get; set; }
-    public float Remaining { get; set; }
+    public Wrapper<float> Remaining { get; set; }
     public Wrapper<float> Coverage { get; set; }
 
 
@@ -73,7 +73,7 @@ public partial class UserStoryAssociation : ObservableObject
     {
         StoryData = storyData;
         ShortTerm = shortTerm;
-        Remaining = remaining;
+        Remaining = new Wrapper<float>() { Value = remaining };
         _days = new(days.Select(x => new Wrapper<float>() { Value = x.Item2, UserName = x.Item1.Username }));
         _colorBackgroundList = new ObservableCollection<Avalonia.Media.Brush>(Enumerable.Repeat(new SolidColorBrush(Colors.White), maxNumberOfUsers).ToList());
         Coverage = new Wrapper<float>() { Value = 0 };
@@ -83,7 +83,7 @@ public partial class UserStoryAssociation : ObservableObject
     {
         StoryData = storyData;
         ShortTerm = shortTerm;
-        Remaining = remaining;
+        Remaining = new Wrapper<float>() { Value = remaining };
         _days = new(days.Select(x => new Wrapper<float>() { Value = x, UserName = "default" }));
         _colorBackgroundList = new ObservableCollection<Avalonia.Media.Brush>(Enumerable.Repeat(new SolidColorBrush(Colors.White), maxNumberOfUsers).ToList());
         Coverage = new Wrapper<float>() { Value = 0 };
