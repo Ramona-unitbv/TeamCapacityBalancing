@@ -30,5 +30,10 @@ namespace TeamCapacityBalancing.Services.PostgresConnection
             CheckKey(key);
             return _reader.GetInt32(_reader.GetOrdinal(key));
         }
+        override public double GetDouble(string key)
+        {
+            CheckKey(key);
+            return _reader.GetDouble(_reader.GetOrdinal(key));
+        }    
     }
 }

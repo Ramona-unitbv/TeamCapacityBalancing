@@ -140,7 +140,7 @@ public sealed partial class SprintSelectionViewModel : ObservableObject
         Sprints.Clear();
         for (int i = 0; i < NrGenerateSprints; i++)
         {
-            Sprints.Add(new Sprint($"Sprint {i + 1}", 3, false));
+            Sprints.Add(new Sprint($"Sprint {i + 1}", 5, false));
         }
     }
 

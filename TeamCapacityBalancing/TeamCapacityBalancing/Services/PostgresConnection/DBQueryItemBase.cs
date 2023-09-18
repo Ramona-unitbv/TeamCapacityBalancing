@@ -25,5 +25,6 @@ namespace TeamCapacityBalancing.Services.PostgresConnection
 
         abstract public string GetString(string key);
         abstract public int GetInt(string key);
+        abstract public double GetDouble(string key);
     }
 }

@@ -29,5 +29,12 @@ namespace TeamCapacityBalancing.Services.PostgresConnection
             decimal result = (decimal)row[key];
             return Convert.ToInt32(result);
         }
+
+        override public double GetDouble(string key)
+        {
+            CheckKey(key);
+            decimal result = (decimal)row[key];
+            return Convert.ToDouble(result);
+        }
     }
 }

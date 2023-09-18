@@ -26,9 +26,9 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         public const string AppUserTable = databasePrefix + "app_user";
 
         public const string StoryIssueType = "7";
+        public const string SubTaskIssueType = "8";
         public const string EpicStoryLinkType = "10200";
         public const string StoryTaskLinkType = "10100";
-        public const string SubTaskIssueType = "10003";
         public const string CustomFieldBusinessCase = "10105";
         public const string OpenStatus = "1";
         public const string Project = "12200";
@@ -124,6 +124,30 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 {"id", "integer" },
                 {"user_name", "string" },
                 {"display_name", "string" }
+        };
+        }
+    }
+
+    class RemainingTimeUserQuery : DBQuery
+    {
+        public RemainingTimeUserQuery()
+        {
+            Query = $@"
+                    SELECT cu.id, cu.user_name, cu.display_name,
+                    SUM(ji.timeestimate / 60 / 60 / 8) AS totalremaining 
+                    FROM {JiraissueTable} AS ji
+                    JOIN {AppUserTable} AS au ON au.user_key = ji.assignee
+                    JOIN {UserTable} AS cu ON cu.user_name = au.user_key
+                    WHERE ji.issuetype = {SubTaskIssueType} 
+                    AND ji.assignee IS NOT NULL AND ji.timeestimate > 0 AND ji.project = {Project}
+                    GROUP BY cu.user_name, cu.id, cu.display_name";
+
+            QuerySchema = new DBQuerySchema()
+            {
+                {"id", "integer" },
+                {"user_name", "string" },
+                {"display_name", "string" },
+                {"totalremaining", "double" },
         };
         }
     }
