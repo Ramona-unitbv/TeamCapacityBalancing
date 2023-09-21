@@ -41,6 +41,8 @@ public sealed partial class SprintSelectionViewModel : ObservableObject
         {
             UserNamePath = ((BalancingViewModel)vm).SelectedUser.Username;
             Sprints = new ObservableCollection<Sprint>(_jsonSerialization.DeserializeSprint(UserNamePath));
+            if (Sprints.Count > 0)
+                _startDate = DateTimeOffset.Parse(Sprints[0].StartDate); 
         }
         NrGenerateSprints = Sprints.Count;
     }

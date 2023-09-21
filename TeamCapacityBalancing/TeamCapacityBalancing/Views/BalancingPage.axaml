@@ -324,7 +324,7 @@
 						<DataGridTemplateColumn Header="Remaining(days)">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock Text="{Binding Remaining}" HorizontalAlignment="Center"/>
+									<TextBlock Text="{Binding Remaining.Value}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -471,7 +471,7 @@
 						<DataGridTemplateColumn Header="Remaining">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock IsVisible="False" Text="{Binding Remaining}" HorizontalAlignment="Center"/>
+									<TextBlock IsVisible="False" Text="{Binding Remaining.Value}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
@@ -614,7 +614,7 @@
 						<DataGridTemplateColumn Header="Remaining">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate x:DataType="models:UserStoryAssociation">
-									<TextBlock IsVisible="False" Text="{Binding Remaining}" HorizontalAlignment="Center"/>
+									<TextBlock IsVisible="False" Text="{Binding Remaining.Value}" HorizontalAlignment="Center"/>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
