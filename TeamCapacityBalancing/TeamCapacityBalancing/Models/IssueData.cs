@@ -11,7 +11,7 @@ public class IssueData
 
     public string? BusinessCase { get; set; }
 
-    public int? EpicID { get; set; }
+    public int? ParentID { get; set; }
     public int Id { get; set; }
     public string? Asignee { get; set; }
     public float Remaining { get; set; }
@@ -33,10 +33,10 @@ public class IssueData
         Type = type;
     }
 
-    public IssueData(int id, string summary, string assignee, float remaining, int epicId = -1)
+    public IssueData(int id, string summary, string assignee, float remaining, int parentId = -1)
     {
         Id = id;
-        EpicID = epicId;
+        ParentID = parentId;
         Name = summary;
         Asignee = assignee;
         Remaining = remaining;

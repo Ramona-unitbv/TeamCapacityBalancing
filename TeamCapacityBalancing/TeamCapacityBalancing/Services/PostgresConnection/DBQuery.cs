@@ -94,8 +94,13 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
             Query = $@"
                     SELECT istory.id, istory.issuenum, istory.summary, istory.assignee, iepic.id AS epicId, istory.timeestimate
                     FROM {JiraissueTable} AS istory, {JiraissueTable} AS iepic, {IssuelinkTable} AS il
-                    WHERE istory.assignee = '{PLID}'  AND il.source = iepic.id AND il.linktype = {EpicStoryLinkType} AND il.destination = istory.id AND istory.timeestimate > 0
-                    AND istory.issuetype = '{StoryIssueType}' AND istory.PROJECT = {Project}";
+                    WHERE istory.assignee = '{PLID}'  AND il.source = iepic.id AND il.linktype = {EpicStoryLinkType} AND il.destination = istory.id 
+                    AND istory.issuetype = '{StoryIssueType}' AND istory.PROJECT = {Project}
+                    AND (istory.timeestimate > 0 OR istory.id in ( 
+                        SELECT Distinct istory2.id
+                        FROM {JiraissueTable} AS istory2, {JiraissueTable} AS itask2, {IssuelinkTable} AS il2
+                        WHERE il2.source = istory2.id AND il2.linktype = {StoryTaskLinkType} AND il2.destination = itask2.id 
+                        AND itask2.timeestimate > 0 AND istory2.PROJECT = {Project}))";
 
             QuerySchema = new DBQuerySchema()
             {

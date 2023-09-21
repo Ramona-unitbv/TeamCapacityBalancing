@@ -14,13 +14,13 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
     public class TeamLeaderInfo
     {
         private readonly string _name;
-        private List<IssueData> _epics = new List<IssueData>();
-        private List<IssueData> _stories = new List<IssueData>();
+        private Dictionary<int, IssueData> _epics = new Dictionary<int, IssueData>();
+        private Dictionary<int, IssueData> _stories = new Dictionary<int, IssueData>();
         public TeamLeaderInfo(string name) { _name = name; }
 
         public string Name { get { return _name; } }
-        public List<IssueData> Epics { get => _epics; set { _epics = value; } }
-        public List<IssueData> Stories { get => _stories; set { _stories = value; } }
+        public Dictionary<int, IssueData> Epics { get => _epics; set { _epics = value; } }
+        public Dictionary<int, IssueData> Stories { get => _stories; set { _stories = value; } }
 
     }
     public class QueriesForDataBase : IDataProvider
@@ -90,7 +90,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         }
 
 
-        public List<IssueData> GetAllStoriesByTeamLeader(User teamLeader)
+        public Dictionary<int, IssueData> GetAllStoriesByTeamLeader(User teamLeader)
         {
             TeamLeaderInfo teamLeaderInfo = GetTeamLeaderInfo(teamLeader.Username);
 
@@ -99,7 +99,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 return teamLeaderInfo.Stories;
             }
 
-            List<IssueData> stories = new List<IssueData>();
+            Dictionary<int, IssueData> stories = new Dictionary<int, IssueData>();
 
             try
             {
@@ -120,10 +120,10 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                     float remaining = item.GetInt("timeestimate") / 60 / 60 / 8; //from seconds to days
                     Math.Round(remaining, 2);
 
-                    if (remaining > 0)
-                    {
-                        stories.Add(new IssueData(id, name, assignee, remaining, epicId));
-                    }
+                    //if (remaining > 0)
+                    //{
+                        stories.Add(id, new IssueData(id, name, assignee, remaining, epicId));
+                    //}
                     item = dBConnection.NextRow();
                 }
             }
@@ -137,7 +137,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
             return stories;
         }
 
-        public List<IssueData> GetAllEpicsByTeamLeader(User teamLeader)
+        public Dictionary<int, IssueData> GetAllEpicsByTeamLeader(User teamLeader)
         {
             TeamLeaderInfo teamLeaderInfo = GetTeamLeaderInfo(teamLeader.Username);
 
@@ -146,7 +146,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 return teamLeaderInfo.Epics;
             }
 
-            List<IssueData> epics = new List<IssueData>();
+            Dictionary<int, IssueData> epics = new Dictionary<int, IssueData>();
 
             try
             {
@@ -163,7 +163,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                     string name = item.GetString("summary");
                     int issueNumber = item.GetInt("issuenum");
                     string businesscase = item.GetString("customvalue");
-                    epics.Add(new IssueData(id, name, businesscase));
+                    epics.Add(id, new IssueData(id, name, businesscase));
                     
                     item = dBConnection.NextRow();
                 }

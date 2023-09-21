@@ -23,7 +23,7 @@ public sealed partial class BalancingViewModel : ObservableObject
     private readonly NavigationService? _navigationService;
     private readonly ServiceCollection _serviceCollection;
     private const int MaxNumberOfUsers = 10;
-    private List<IssueData> allStories = new();
+    private Dictionary<int, IssueData> allStories = new();
     private List<UserStoryAssociation> allUserStoryAssociation = new();
     private int currentEpicId = 0;
     private List<Tuple<User, float>> totalWork;
@@ -194,12 +194,12 @@ public sealed partial class BalancingViewModel : ObservableObject
         BusinessCase.Clear();
         FilterString = "Non-generic Epics";
         businessCaseSet.Clear();
-        List<IssueData> epics;
+        Dictionary<int, IssueData> epics;
         epics = _queriesForDataBase.GetAllEpicsByTeamLeader(SelectedUser);
         allStories = _queriesForDataBase.GetAllStoriesByTeamLeader(SelectedUser);
         if (epics != null)
         {
-            Epics = new ObservableCollection<IssueData>(epics);
+            Epics = new ObservableCollection<IssueData>(epics.Values);
             OnPropertyChanged("Epics");
         }
         if (File.Exists(JsonSerialization.UserFilePath + SelectedUser.Username))
@@ -277,8 +277,9 @@ public sealed partial class BalancingViewModel : ObservableObject
     {
         List<Tuple<User, float>> capacityList = GenerateDefaultDays();
 
-        foreach (IssueData story in allStories)
+        foreach (var item in allStories)
         {
+            IssueData story = item.Value;
             allUserStoryAssociation.Add(new UserStoryAssociation(story, false, story.Remaining, capacityList, MaxNumberOfUsers));
             MyUserAssociation.Add(allUserStoryAssociation.Last());
         }
@@ -423,7 +424,7 @@ public sealed partial class BalancingViewModel : ObservableObject
         List < UserStoryAssociation > associations = new List <UserStoryAssociation>();
         for (int allUserStoryAssociationIndex = 0; allUserStoryAssociationIndex < allUserStoryAssociation.Count; allUserStoryAssociationIndex++)
         {
-            if (allUserStoryAssociation[allUserStoryAssociationIndex].StoryData.EpicID == epicId)
+            if (allUserStoryAssociation[allUserStoryAssociationIndex].StoryData.ParentID == epicId)
                 associations.Add(allUserStoryAssociation[allUserStoryAssociationIndex]);
         }
         return associations;
@@ -599,8 +600,8 @@ public sealed partial class BalancingViewModel : ObservableObject
     private void RepopulateEpics()
     {
         Epics.Clear();
-        List<IssueData> epics = _queriesForDataBase.GetAllEpicsByTeamLeader(SelectedUser);
-        foreach (var item in epics)
+        Dictionary<int, IssueData> epics = _queriesForDataBase.GetAllEpicsByTeamLeader(SelectedUser);
+        foreach (var item in epics.Values)
         {
             if (GetUserStoryAssociationsForEpic(item.Id).Count > 0)
                 Epics.Add(item);
@@ -618,7 +619,7 @@ public sealed partial class BalancingViewModel : ObservableObject
         MyUserAssociation.Clear();
         foreach (var asoc in allUserStoryAssociation)
         {
-            if (epicIDs.Contains(asoc.StoryData.EpicID.GetValueOrDefault()))
+            if (epicIDs.Contains(asoc.StoryData.ParentID.GetValueOrDefault()))
                 MyUserAssociation.Add(asoc);
         }
     }
@@ -641,7 +642,7 @@ public sealed partial class BalancingViewModel : ObservableObject
                 {
                     for (int userStoryAssociationIndex = 0; userStoryAssociationIndex < MyUserAssociation.Count; ++userStoryAssociationIndex)
                     {
-                        if (MyUserAssociation[userStoryAssociationIndex].StoryData.EpicID != currentEpicId)
+                        if (MyUserAssociation[userStoryAssociationIndex].StoryData.ParentID != currentEpicId)
                         {
                             MyUserAssociation.Remove(MyUserAssociation[userStoryAssociationIndex]);
                             userStoryAssociationIndex--;
@@ -719,8 +720,9 @@ public sealed partial class BalancingViewModel : ObservableObject
     {
         List<Tuple<User, float>> capacityList = GenerateDefaultDays();
 
-        foreach (var story in allStories)
+        foreach (var item in allStories)
         {
+            IssueData story = item.Value;
             var asoc = allUserStoryAssociation.FirstOrDefault(u => u.StoryData.Id == story.Id);
             if (asoc == null)
             {
