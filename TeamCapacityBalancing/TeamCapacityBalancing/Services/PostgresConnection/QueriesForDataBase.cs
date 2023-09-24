@@ -16,11 +16,14 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         private readonly string _name;
         private Dictionary<int, IssueData> _epics = new Dictionary<int, IssueData>();
         private Dictionary<int, IssueData> _stories = new Dictionary<int, IssueData>();
+        private Dictionary<int, IssueData> _tasks = new Dictionary<int, IssueData>();
+
         public TeamLeaderInfo(string name) { _name = name; }
 
         public string Name { get { return _name; } }
         public Dictionary<int, IssueData> Epics { get => _epics; set { _epics = value; } }
         public Dictionary<int, IssueData> Stories { get => _stories; set { _stories = value; } }
+        public Dictionary<int, IssueData> Tasks { get => _tasks; set { _tasks = value; } }
 
     }
     public class QueriesForDataBase : IDataProvider
@@ -116,13 +119,13 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                     string name = item.GetString("summary");
                     string assignee = item.GetString("assignee");
                     int issueNumber = item.GetInt("issuenum");
-                    int epicId = item.GetInt("epicId");
+                    int parentId = item.GetInt("parentId");
                     float remaining = item.GetInt("timeestimate") / 60 / 60 / 8; //from seconds to days
                     Math.Round(remaining, 2);
 
                     //if (remaining > 0)
                     //{
-                        stories.Add(id, new IssueData(id, name, assignee, remaining, epicId));
+                        stories.Add(id, new IssueData(id, name, assignee, remaining, parentId));
                     //}
                     item = dBConnection.NextRow();
                 }
@@ -136,7 +139,6 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
 
             return stories;
         }
-
         public Dictionary<int, IssueData> GetAllEpicsByTeamLeader(User teamLeader)
         {
             TeamLeaderInfo teamLeaderInfo = GetTeamLeaderInfo(teamLeader.Username);
@@ -178,6 +180,56 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
 
             return epics;
         }
+
+        public Dictionary<int, IssueData> GetOpenTasksForMembersByTeamLeader(User teamLeader)
+        {
+            TeamLeaderInfo teamLeaderInfo = GetTeamLeaderInfo(teamLeader.Username);
+
+            if (teamLeaderInfo.Tasks.Count > 0)
+            {
+                return teamLeaderInfo.Tasks;
+            }
+
+            Dictionary<int, IssueData> tasks = new Dictionary<int, IssueData>();
+
+            try
+            {
+                DataBaseConnectionBase dBConnection = DataBaseConnectionBaseFactory.GetMeTheRightConnection();
+                dBConnection.ConnectToJira();
+
+                if (!dBConnection.RunQuery(new OpenTasksForMembersByPLQuery(teamLeader.Username)))
+                    return tasks;
+
+                var item = dBConnection.NextRow();
+                while (item != null)
+                {
+                    int id = item.GetInt("id");
+                    string name = item.GetString("summary");
+                    string assignee = item.GetString("assignee");
+                    int parentId = item.GetInt("parentId");
+                    float remaining = item.GetInt("timeestimate") / 60 / 60 / 8;
+
+                    Math.Round(remaining, 2);
+
+                    //if (remaining > 0)
+                    //{
+                    tasks.Add(id, new IssueData(id, name, assignee, remaining, parentId));
+                    //}
+                    item = dBConnection.NextRow();
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            teamLeaderInfo.Tasks = tasks;
+
+            return tasks;
+        }
+
+        
         public List<User> GetAllTeamLeaders()
         {
             if (teamLeaders.Count > 0)

@@ -24,6 +24,7 @@ public sealed partial class BalancingViewModel : ObservableObject
     private readonly ServiceCollection _serviceCollection;
     private const int MaxNumberOfUsers = 10;
     private Dictionary<int, IssueData> allStories = new();
+    private Dictionary<int, IssueData> allTasks = new();
     private List<UserStoryAssociation> allUserStoryAssociation = new();
     private int currentEpicId = 0;
     private List<Tuple<User, float>> totalWork;
@@ -197,6 +198,7 @@ public sealed partial class BalancingViewModel : ObservableObject
         Dictionary<int, IssueData> epics;
         epics = _queriesForDataBase.GetAllEpicsByTeamLeader(SelectedUser);
         allStories = _queriesForDataBase.GetAllStoriesByTeamLeader(SelectedUser);
+        allTasks = _queriesForDataBase.GetOpenTasksForMembersByTeamLeader(SelectedUser);
         if (epics != null)
         {
             Epics = new ObservableCollection<IssueData>(epics.Values);
@@ -299,12 +301,46 @@ public sealed partial class BalancingViewModel : ObservableObject
 
     public void GetOpenTasks()
     {
-        OpenTasks = _queriesForDataBase.GetRemainingForUser();
+        if (IsShortTermVisible)
+        {
+            OpenTasks.Clear();
+            HashSet<int> shortTermStoriesIDs = new HashSet<int>();
+            foreach (var item in ShortTermStoryes)
+            {
+                shortTermStoriesIDs.Add(item.StoryData.Id);
+            }
+
+            Dictionary<int, IssueData> tasks = _queriesForDataBase.GetOpenTasksForMembersByTeamLeader(SelectedUser);
+            Dictionary<string, double> remainings = new Dictionary<string, double>();
+            foreach (var item in tasks)
+            {
+                IssueData task = item.Value;
+                if (shortTermStoriesIDs.Contains(task.ParentID.GetValueOrDefault()))
+                {
+                    string user = task.Asignee;
+                    if (remainings.ContainsKey(user))
+                        remainings[user] += task.Remaining;
+                    else
+                        remainings.Add(user, task.Remaining);
+                }
+            }
+
+            List<OpenTasksUserAssociation> auxrem = new();
+            foreach (var item in remainings)
+            {
+                auxrem.Add(new OpenTasksUserAssociation(new User(item.Key), (float)item.Value));
+            }
+            OpenTasks = auxrem;
+        }
+        else
+        {
+            OpenTasks = _queriesForDataBase.GetRemainingForUser();
+        }
 
         List<OpenTasksUserAssociation> aux = new();
         foreach (var user in TeamMembers)
         {
-            OpenTasksUserAssociation? oT = OpenTasks.FirstOrDefault(x => x.User.Id == user.Id);
+            OpenTasksUserAssociation? oT = OpenTasks.FirstOrDefault(x => x.User.Username == user.Username);
             if (oT != null)
             {
                 aux.Add(new OpenTasksUserAssociation(user, oT.Remaining));
@@ -782,7 +818,7 @@ public sealed partial class BalancingViewModel : ObservableObject
 
     public void CalculateTotals()
     {
-
+        GetOpenTasks();
         CalculateWork(IsShortTermVisible);
         OrderTeamAndStoryInfo();
         CalculateBalancing(IsShortTermVisible);
@@ -1025,8 +1061,7 @@ public sealed partial class BalancingViewModel : ObservableObject
     
     
     
-};
-
+}
 
 
 

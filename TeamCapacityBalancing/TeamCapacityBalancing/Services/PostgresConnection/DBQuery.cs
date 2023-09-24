@@ -92,7 +92,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
         public StoriesForPLQuery(string PLID)
         {
             Query = $@"
-                    SELECT istory.id, istory.issuenum, istory.summary, istory.assignee, iepic.id AS epicId, istory.timeestimate
+                    SELECT istory.id, istory.issuenum, istory.summary, istory.assignee, iepic.id AS parentId, istory.timeestimate
                     FROM {JiraissueTable} AS istory, {JiraissueTable} AS iepic, {IssuelinkTable} AS il
                     WHERE istory.assignee = '{PLID}'  AND il.source = iepic.id AND il.linktype = {EpicStoryLinkType} AND il.destination = istory.id 
                     AND istory.issuetype = '{StoryIssueType}' AND istory.PROJECT = {Project}
@@ -108,7 +108,29 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
                 {"summary", "string" },
                 {"assignee", "string" },
                 {"issuenum", "integer" },
-                {"epicId", "integer" },
+                {"parentId", "integer" },
+                {"timeestimate", "integer" }
+        };
+        }
+    }
+
+    class OpenTasksForMembersByPLQuery : DBQuery
+    {
+        public OpenTasksForMembersByPLQuery(string PLID)
+        {
+            Query = $@"
+                    SELECT itask.id, istory.id as parentID, itask.summary, itask.timeestimate, itask.assignee
+                    FROM {JiraissueTable} AS istory, {JiraissueTable} AS itask, {IssuelinkTable} AS il
+                    WHERE istory.assignee = '{PLID}'  AND il.source = istory.id AND il.linktype = {StoryTaskLinkType} AND il.destination = itask.id 
+                    AND itask.issuetype = '{SubTaskIssueType}' AND istory.PROJECT = {Project}
+                    AND itask.timeestimate > 0";
+
+            QuerySchema = new DBQuerySchema()
+            {
+                {"id", "integer" },
+                {"summary", "string" },
+                {"assignee", "string" },
+                {"parentId", "integer" },
                 {"timeestimate", "integer" }
         };
         }
