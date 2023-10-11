@@ -57,6 +57,9 @@
       <Button  Width="40" Height="40" Background="Transparent" Command="{Binding BalanceButtonCommand}">
         <icons:MaterialIcon Width="40" Height="40" Kind="ScaleBalance"/>
       </Button>
+      <Button  Width="40" Height="40" Background="Transparent" Command="{Binding ClearButtonCommand}">
+        <icons:MaterialIcon Width="40" Height="40" Kind="Eraser"/>
+      </Button>
 			<Button  Width="40" Height="40" Background="Transparent" Command="{Binding CalculateCoverageButtonCommand}">
 				<icons:MaterialIcon Width="40" Height="40" Kind="Percent"/>
 			</Button>

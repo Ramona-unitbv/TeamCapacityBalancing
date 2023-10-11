@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -13,6 +14,9 @@ using TeamCapacityBalancing.Services.LocalDataSerialization;
 using TeamCapacityBalancing.Services.Postgres_connection;
 using TeamCapacityBalancing.Services.ServicesAbstractions;
 using TeamCapacityBalancing.Views;
+using MessageBox.Avalonia;
+using MessageBox.Avalonia.DTO;
+using MessageBox.Avalonia.Enums;
 
 namespace TeamCapacityBalancing.ViewModels;
 
@@ -756,6 +760,17 @@ public sealed partial class BalancingViewModel : ObservableObject
     {
         List<Tuple<User, float>> capacityList = GenerateDefaultDays();
 
+        int index = 0;
+        while (index < allUserStoryAssociation.Count)
+        {
+            var storyAsoc = allUserStoryAssociation[index];
+            var story = allStories.FirstOrDefault(u => u.Value.Id == storyAsoc.StoryData.Id);
+            if (story.Value == null)
+                allUserStoryAssociation.RemoveAt(index);
+            else
+                index++;
+        }
+        
         foreach (var item in allStories)
         {
             IssueData story = item.Value;
@@ -771,6 +786,8 @@ public sealed partial class BalancingViewModel : ObservableObject
                 asoc.StoryData.Remaining = story.Remaining;
             }
         }
+
+
     }
     public void CalculateCoverage()
     {
@@ -791,7 +808,7 @@ public sealed partial class BalancingViewModel : ObservableObject
         {
             if (TeamMembers[j].Id != 0)
                 membersCount++;
-            if (TeamMembers[j].Username != SelectedUser.Username)
+            if (TeamMembers[j].Username == SelectedUser.Username)
                 leaderIndex = j;
         }
 
@@ -801,7 +818,7 @@ public sealed partial class BalancingViewModel : ObservableObject
         for (int i = 0; i < MyUserAssociation.Count; i++)
         {
             MyUserAssociation[i].CalculateCoverage();
-            if (MyUserAssociation[i].Coverage.GetValue() == 0)
+            if (MyUserAssociation[i].Coverage.GetValue() != 100)
             {
                 for (int j = 0; j < TeamMembers.Count; j++)
                     if (TeamMembers[j].Id != 0)
@@ -812,6 +829,37 @@ public sealed partial class BalancingViewModel : ObservableObject
                             MyUserAssociation[i].Days[j].Value = percentage;
                     }
                 MyUserAssociation[i].CalculateCoverage();
+            }
+        }
+    }
+
+    public async void ClearCoverage()
+    {
+        var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+               new MessageBoxStandardParams
+               {
+                   ButtonDefinitions = ButtonEnum.YesNoCancel,
+                   ContentTitle = "Clear Coverage",
+                   ContentHeader = "Warning",
+                   ContentMessage = "All the coverage will be reset. Are you sure?"
+               });
+
+        var result = await messageBoxStandardWindow.Show();
+
+        if (result == ButtonResult.Yes)
+        {
+
+            for (int i = 0; i < MyUserAssociation.Count; i++)
+            {
+                if (MyUserAssociation[i].Coverage.GetValue() > 0)
+                {
+                    for (int j = 0; j < TeamMembers.Count; j++)
+                        if (TeamMembers[j].Id != 0)
+                        {
+                            MyUserAssociation[i].Days[j].Value = 0;
+                        }
+                    MyUserAssociation[i].CalculateCoverage();
+                }
             }
         }
     }
@@ -959,6 +1007,16 @@ public sealed partial class BalancingViewModel : ObservableObject
         if (SelectedUser != null)
         {
             BalanceMembers();
+            CalculateTotals();
+        }
+    }
+
+    [RelayCommand]
+    public void ClearButton()
+    {
+        if (SelectedUser != null)
+        {
+            ClearCoverage();
             CalculateTotals();
         }
     }

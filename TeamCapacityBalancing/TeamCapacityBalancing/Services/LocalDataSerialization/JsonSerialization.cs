@@ -13,7 +13,7 @@ namespace TeamCapacityBalancing.Services.LocalDataSerialization
 {
     public class JsonSerialization : IDataSerialization
     {
-        public const string BasePath = "../../../LocalFiles/";
+        public const string BasePath = "c:/Temp/TCB/LocalFiles/";
         public const string UserStoryFilePath = BasePath + "UserStoryData/";
         public const string UserFilePath = BasePath + "TeamData/";
         public const string SprintPath = BasePath + "SprintData/";
