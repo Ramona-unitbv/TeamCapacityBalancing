@@ -11,7 +11,7 @@ namespace TeamCapacityBalancing.Services.Postgres_connection
 {
     public class DataBaseConnectionSQL: DataBaseConnectionBase
     {
-        private SqlConnection conn = new SqlConnection("Server= belnspdevsql001; Database= jiradb; Integrated Security=True;");
+        private SqlConnection conn = new SqlConnection("Server= belnspdevsql001.net.plm.eds.com; Database= jiradb; Integrated Security=True;");
         private bool connected = false;
         private DataTable? table;
         private DBQuery lastQuery;
