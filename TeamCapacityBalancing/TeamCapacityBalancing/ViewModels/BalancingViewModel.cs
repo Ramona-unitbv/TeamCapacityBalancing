@@ -800,35 +800,50 @@ public sealed partial class BalancingViewModel : ObservableObject
         ChangeColorOnCovorage();
     }
 
-    public void BalanceMembers()
+    public async void BalanceMembers()
     {
-        int membersCount = 0;
-        int leaderIndex = 0;
-        for (int j = 0; j < TeamMembers.Count; j++)
-        {
-            if (TeamMembers[j].Id != 0)
-                membersCount++;
-            if (TeamMembers[j].Username == SelectedUser.Username)
-                leaderIndex = j;
-        }
+       var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+       new MessageBoxStandardParams
+       {
+           ButtonDefinitions = ButtonEnum.YesNoCancel,
+           ContentTitle = "Balance Coverage",
+           ContentHeader = "Warning",
+           ContentMessage = "All the stories will be equally balanced in coverage. Are you sure?"
+       });
 
-        float percentage = (float)Math.Round(((float)100)/membersCount, 2);
-        float leaderpercentage = 100 - percentage * (membersCount - 1);
+        var result = await messageBoxStandardWindow.Show();
 
-        for (int i = 0; i < MyUserAssociation.Count; i++)
+        if (result == ButtonResult.Yes)
         {
-            MyUserAssociation[i].CalculateCoverage();
-            if (MyUserAssociation[i].Coverage.GetValue() != 100)
+
+            int membersCount = 0;
+            int leaderIndex = 0;
+            for (int j = 0; j < TeamMembers.Count; j++)
             {
-                for (int j = 0; j < TeamMembers.Count; j++)
-                    if (TeamMembers[j].Id != 0)
-                    {
-                        if (j == leaderIndex)
-                            MyUserAssociation[i].Days[j].Value = leaderpercentage;
-                        else
-                            MyUserAssociation[i].Days[j].Value = percentage;
-                    }
+                if (TeamMembers[j].Id != 0)
+                    membersCount++;
+                if (TeamMembers[j].Username == SelectedUser.Username)
+                    leaderIndex = j;
+            }
+
+            float percentage = (float)Math.Round(((float)100) / membersCount, 2);
+            float leaderpercentage = 100 - percentage * (membersCount - 1);
+
+            for (int i = 0; i < MyUserAssociation.Count; i++)
+            {
                 MyUserAssociation[i].CalculateCoverage();
+                if (MyUserAssociation[i].Coverage.GetValue() != 100)
+                {
+                    for (int j = 0; j < TeamMembers.Count; j++)
+                        if (TeamMembers[j].Id != 0)
+                        {
+                            if (j == leaderIndex)
+                                MyUserAssociation[i].Days[j].Value = leaderpercentage;
+                            else
+                                MyUserAssociation[i].Days[j].Value = percentage;
+                        }
+                    MyUserAssociation[i].CalculateCoverage();
+                }
             }
         }
     }
