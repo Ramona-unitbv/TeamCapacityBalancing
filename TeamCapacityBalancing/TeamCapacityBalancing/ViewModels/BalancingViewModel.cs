@@ -782,6 +782,7 @@ public sealed partial class BalancingViewModel : ObservableObject
             }
             else
             {
+                asoc.StoryData.Name = story.Name;
                 asoc.Remaining = new Wrapper<float>() { Value = story.Remaining };
                 asoc.StoryData.Remaining = story.Remaining;
             }
