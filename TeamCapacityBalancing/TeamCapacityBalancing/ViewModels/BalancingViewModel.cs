@@ -8,15 +8,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using TeamCapacityBalancing.Models;
 using TeamCapacityBalancing.Navigation;
 using TeamCapacityBalancing.Services.LocalDataSerialization;
 using TeamCapacityBalancing.Services.Postgres_connection;
 using TeamCapacityBalancing.Services.ServicesAbstractions;
 using TeamCapacityBalancing.Views;
-using MessageBox.Avalonia;
-using MessageBox.Avalonia.DTO;
-using MessageBox.Avalonia.Enums;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Dto;
+//using MessageBox.Avalonia.DTO;
+using MsBox.Avalonia.Enums;
 
 namespace TeamCapacityBalancing.ViewModels;
 
@@ -25,13 +27,13 @@ public sealed partial class BalancingViewModel : ObservableObject
     //private variables
     private readonly PageService? _pageService;
     private readonly NavigationService? _navigationService;
-    private readonly ServiceCollection _serviceCollection;
+    private readonly ServiceCollection _serviceCollection = new ServiceCollection();
     private const int MaxNumberOfUsers = 10;
     private Dictionary<int, IssueData> allStories = new();
     private Dictionary<int, IssueData> allTasks = new();
     private List<UserStoryAssociation> allUserStoryAssociation = new();
     private int currentEpicId = 0;
-    private List<Tuple<User, float>> totalWork;
+    private List<Tuple<User, float>> totalWork = new List<Tuple<User, float>>();
     private HashSet<string> businessCaseSet = new();
     public DateTime finishDate;
 
@@ -42,10 +44,10 @@ public sealed partial class BalancingViewModel : ObservableObject
 
     //Observable properties
     [ObservableProperty]
-    public List<User> _allUsers;
+    public List<User> _allUsers = new List<User>();
 
     [ObservableProperty]
-    public List<OpenTasksUserAssociation> _openTasks;
+    public List<OpenTasksUserAssociation> _openTasks = new List<OpenTasksUserAssociation>();
 
     [ObservableProperty]
     private bool _isShortTermVisible = false;
@@ -69,10 +71,10 @@ public sealed partial class BalancingViewModel : ObservableObject
     public ObservableCollection<UserStoryAssociation> _myUserAssociation = new ();
 
     [ObservableProperty]
-    public ObservableCollection<UserStoryAssociation> _shortTermStoryes;
+    public ObservableCollection<UserStoryAssociation> _shortTermStoryes = new ObservableCollection<UserStoryAssociation>();
 
     [ObservableProperty]
-    private ObservableCollection<User> _teamMembers;
+    private ObservableCollection<User> _teamMembers = new ObservableCollection<User>();
 
     private readonly HashSet<string> _genericEpics = new HashSet<string>() { "ABSENT", "OPER", "MAINT", "STRAT", "ALL" };
 
@@ -94,7 +96,7 @@ public sealed partial class BalancingViewModel : ObservableObject
             ),
     };
 
-    private string _filterString;
+    private string _filterString = "";
     public string FilterString
     {
         get
@@ -168,22 +170,22 @@ public sealed partial class BalancingViewModel : ObservableObject
     };
 
     //Constructors
-    public BalancingViewModel()
-    {
+    //public BalancingViewModel()
+    //{
 
-    }
+    //}
 
-    public BalancingViewModel(PageService pageService, NavigationService navigationService, ServiceCollection serviceCollection)
-    {
-        _pageService = pageService;
-        _navigationService = navigationService;
-        _serviceCollection = serviceCollection;
-        PopulateDefaultTeamUsers();
-        ShowShortTermStoryes();
-        AllUsers = _queriesForDataBase.GetAllTeamLeaders();
-        //OpenTasks = _queriesForDataBase.GetRemainingForUser();
+    //public BalancingViewModel(PageService pageService, NavigationService navigationService, ServiceCollection serviceCollection)
+    //{
+    //    _pageService = pageService;
+    //    _navigationService = navigationService;
+    //    _serviceCollection = serviceCollection;
+    //    PopulateDefaultTeamUsers();
+    //    ShowShortTermStoryes();
+    //    AllUsers = _queriesForDataBase.GetAllTeamLeaders();
+    //    //OpenTasks = _queriesForDataBase.GetRemainingForUser();
 
-    }
+    //}
 
 
 
@@ -803,7 +805,7 @@ public sealed partial class BalancingViewModel : ObservableObject
 
     public async void BalanceMembers()
     {
-       var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+      var messageBoxStandardWindow = MessageBoxManager.GetMessageBoxStandard(
        new MessageBoxStandardParams
        {
            ButtonDefinitions = ButtonEnum.YesNoCancel,
@@ -812,7 +814,7 @@ public sealed partial class BalancingViewModel : ObservableObject
            ContentMessage = "All the stories will be equally balanced in coverage. Are you sure?"
        });
 
-        var result = await messageBoxStandardWindow.Show();
+        var result = await messageBoxStandardWindow.ShowAsync();
 
         if (result == ButtonResult.Yes)
         {
@@ -851,7 +853,7 @@ public sealed partial class BalancingViewModel : ObservableObject
 
     public async void ClearCoverage()
     {
-        var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+        var messageBoxStandardWindow = MessageBoxManager.GetMessageBoxStandard(
                new MessageBoxStandardParams
                {
                    ButtonDefinitions = ButtonEnum.YesNoCancel,
@@ -860,7 +862,7 @@ public sealed partial class BalancingViewModel : ObservableObject
                    ContentMessage = "All the coverage will be reset. Are you sure?"
                });
 
-        var result = await messageBoxStandardWindow.Show();
+        var result = await messageBoxStandardWindow.ShowAsync();
 
         if (result == ButtonResult.Yes)
         {

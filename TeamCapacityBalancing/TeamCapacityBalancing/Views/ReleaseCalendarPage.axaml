@@ -33,7 +33,7 @@
 			</StackPanel>
 		</Grid>
 
-		<DataGrid Grid.Row="1" x:Name="calendarGrid" CanUserResizeColumns="True"  ColumnWidth="*" Items="{Binding Sprints}" AutoGenerateColumns="False"
+		<DataGrid Grid.Row="1" x:Name="calendarGrid" CanUserResizeColumns="True"  ColumnWidth="*" ItemsSource="{Binding Sprints}" AutoGenerateColumns="False"
 			   GridLinesVisibility="All" BorderThickness="1" BorderBrush="Gray" Margin="25">
 
 			<DataGrid.Columns>

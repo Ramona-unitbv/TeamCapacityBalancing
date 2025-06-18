@@ -48,7 +48,7 @@
 					<TextBlock Text="All Users" FontSize="20"/>
 				</StackPanel>
 
-				<ListBox Items="{Binding AllUsers}" SelectedItem="{Binding SelectedUserAllUsers}"  Grid.Row="1" Margin="5" >
+				<ListBox ItemsSource="{Binding AllUsers}" SelectedItem="{Binding SelectedUserAllUsers}"  Grid.Row="1" Margin="5" >
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<StackPanel Orientation="Horizontal">
@@ -87,7 +87,7 @@
 					<TextBlock Text="My Team" FontSize="20"/>
 				</StackPanel>
 
-				<ListBox Items="{Binding YourTeam}"  SelectedItem="{Binding SelectedUserYourTeam}" Grid.Row="1" Margin="5">
+				<ListBox ItemsSource="{Binding YourTeam}"  SelectedItem="{Binding SelectedUserYourTeam}" Grid.Row="1" Margin="5">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<StackPanel Orientation="Horizontal">

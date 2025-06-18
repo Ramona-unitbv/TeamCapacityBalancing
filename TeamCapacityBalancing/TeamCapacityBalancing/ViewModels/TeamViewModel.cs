@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
 using TeamCapacityBalancing.Models;
 using TeamCapacityBalancing.Navigation;
 using TeamCapacityBalancing.Services.LocalDataSerialization;
